@@ -7,9 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		996513122804451300C913E6 /* ModelCollectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9965130D2804451300C913E6 /* ModelCollectionTests.swift */; };
+		996513132804451300C913E6 /* ModelObjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9965130E2804451300C913E6 /* ModelObjectTests.swift */; };
+		996513142804451300C913E6 /* ModelIDTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9965130F2804451300C913E6 /* ModelIDTests.swift */; };
+		996513152804451300C913E6 /* ModelSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 996513102804451300C913E6 /* ModelSettingsTests.swift */; };
+		996513162804451300C913E6 /* ModelControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 996513112804451300C913E6 /* ModelControllerTests.swift */; };
+		996513192804453200C913E6 /* XCTestExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 996513182804453200C913E6 /* XCTestExtensions.swift */; };
+		9965131A2804453200C913E6 /* Mocking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 996513172804453200C913E6 /* Mocking.swift */; };
+		9965131D2804457700C913E6 /* TestObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9965131C2804457700C913E6 /* TestObjects.swift */; };
 		99CC5B5D27F1EFE80084ADFF /* M3Data.docc in Sources */ = {isa = PBXBuildFile; fileRef = 99CC5B5C27F1EFE80084ADFF /* M3Data.docc */; };
 		99CC5B6327F1EFE80084ADFF /* M3Data.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 99CC5B5827F1EFE80084ADFF /* M3Data.framework */; };
-		99CC5B6827F1EFE80084ADFF /* M3DataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99CC5B6727F1EFE80084ADFF /* M3DataTests.swift */; };
 		99CC5B6927F1EFE80084ADFF /* M3Data.h in Headers */ = {isa = PBXBuildFile; fileRef = 99CC5B5B27F1EFE80084ADFF /* M3Data.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		99CC5B7927F1F0120084ADFF /* ModelObservation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99CC5B7227F1F0120084ADFF /* ModelObservation.swift */; };
 		99CC5B7A27F1F0120084ADFF /* ModelObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99CC5B7327F1F0120084ADFF /* ModelObject.swift */; };
@@ -31,11 +38,18 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		9965130D2804451300C913E6 /* ModelCollectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModelCollectionTests.swift; sourceTree = "<group>"; };
+		9965130E2804451300C913E6 /* ModelObjectTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModelObjectTests.swift; sourceTree = "<group>"; };
+		9965130F2804451300C913E6 /* ModelIDTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModelIDTests.swift; sourceTree = "<group>"; };
+		996513102804451300C913E6 /* ModelSettingsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModelSettingsTests.swift; sourceTree = "<group>"; };
+		996513112804451300C913E6 /* ModelControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModelControllerTests.swift; sourceTree = "<group>"; };
+		996513172804453200C913E6 /* Mocking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mocking.swift; sourceTree = "<group>"; };
+		996513182804453200C913E6 /* XCTestExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XCTestExtensions.swift; sourceTree = "<group>"; };
+		9965131C2804457700C913E6 /* TestObjects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestObjects.swift; sourceTree = "<group>"; };
 		99CC5B5827F1EFE80084ADFF /* M3Data.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = M3Data.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		99CC5B5B27F1EFE80084ADFF /* M3Data.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = M3Data.h; sourceTree = "<group>"; };
 		99CC5B5C27F1EFE80084ADFF /* M3Data.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = M3Data.docc; sourceTree = "<group>"; };
 		99CC5B6227F1EFE80084ADFF /* M3DataTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = M3DataTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		99CC5B6727F1EFE80084ADFF /* M3DataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M3DataTests.swift; sourceTree = "<group>"; };
 		99CC5B7227F1F0120084ADFF /* ModelObservation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModelObservation.swift; sourceTree = "<group>"; };
 		99CC5B7327F1F0120084ADFF /* ModelObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModelObject.swift; sourceTree = "<group>"; };
 		99CC5B7427F1F0120084ADFF /* ModelRelationship.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModelRelationship.swift; sourceTree = "<group>"; };
@@ -64,6 +78,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		9965131B2804453800C913E6 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				9965131C2804457700C913E6 /* TestObjects.swift */,
+				996513172804453200C913E6 /* Mocking.swift */,
+				996513182804453200C913E6 /* XCTestExtensions.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
 		99CC5B4E27F1EFE80084ADFF = {
 			isa = PBXGroup;
 			children = (
@@ -101,7 +125,12 @@
 		99CC5B6627F1EFE80084ADFF /* M3DataTests */ = {
 			isa = PBXGroup;
 			children = (
-				99CC5B6727F1EFE80084ADFF /* M3DataTests.swift */,
+				9965131B2804453800C913E6 /* Helpers */,
+				996513112804451300C913E6 /* ModelControllerTests.swift */,
+				996513102804451300C913E6 /* ModelSettingsTests.swift */,
+				9965130F2804451300C913E6 /* ModelIDTests.swift */,
+				9965130D2804451300C913E6 /* ModelCollectionTests.swift */,
+				9965130E2804451300C913E6 /* ModelObjectTests.swift */,
 			);
 			path = M3DataTests;
 			sourceTree = "<group>";
@@ -230,7 +259,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				99CC5B6827F1EFE80084ADFF /* M3DataTests.swift in Sources */,
+				996513132804451300C913E6 /* ModelObjectTests.swift in Sources */,
+				996513162804451300C913E6 /* ModelControllerTests.swift in Sources */,
+				996513152804451300C913E6 /* ModelSettingsTests.swift in Sources */,
+				996513142804451300C913E6 /* ModelIDTests.swift in Sources */,
+				9965131A2804453200C913E6 /* Mocking.swift in Sources */,
+				996513192804453200C913E6 /* XCTestExtensions.swift in Sources */,
+				9965131D2804457700C913E6 /* TestObjects.swift in Sources */,
+				996513122804451300C913E6 /* ModelCollectionTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -245,6 +281,217 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		996513072804429F00C913E6 /* Test */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 12.2;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG TEST";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Test;
+		};
+		996513082804429F00C913E6 /* Test */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = K3K39KWKBV;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mcubedsw.M3Data;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Test;
+		};
+		996513092804429F00C913E6 /* Test */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Z699XFM6P2;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mcubedsw.M3DataTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Test;
+		};
+		9965130A280443DB00C913E6 /* Archive */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 12.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Archive;
+		};
+		9965130B280443DB00C913E6 /* Archive */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = K3K39KWKBV;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mcubedsw.M3Data;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Archive;
+		};
+		9965130C280443DB00C913E6 /* Archive */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Z699XFM6P2;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mcubedsw.M3DataTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Archive;
+		};
 		99CC5B6A27F1EFE80084ADFF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -463,7 +710,9 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				99CC5B6A27F1EFE80084ADFF /* Debug */,
+				996513072804429F00C913E6 /* Test */,
 				99CC5B6B27F1EFE80084ADFF /* Release */,
+				9965130A280443DB00C913E6 /* Archive */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -472,7 +721,9 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				99CC5B6D27F1EFE80084ADFF /* Debug */,
+				996513082804429F00C913E6 /* Test */,
 				99CC5B6E27F1EFE80084ADFF /* Release */,
+				9965130B280443DB00C913E6 /* Archive */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -481,7 +732,9 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				99CC5B7027F1EFE80084ADFF /* Debug */,
+				996513092804429F00C913E6 /* Test */,
 				99CC5B7127F1EFE80084ADFF /* Release */,
+				9965130C280443DB00C913E6 /* Archive */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
