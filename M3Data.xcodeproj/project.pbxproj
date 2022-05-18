@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		991C3F95283561FB00F3BF20 /* ModelID+Pasteboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 991C3F94283561FB00F3BF20 /* ModelID+Pasteboard.swift */; };
 		996513122804451300C913E6 /* ModelCollectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9965130D2804451300C913E6 /* ModelCollectionTests.swift */; };
 		996513132804451300C913E6 /* ModelObjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9965130E2804451300C913E6 /* ModelObjectTests.swift */; };
 		996513142804451300C913E6 /* ModelIDTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9965130F2804451300C913E6 /* ModelIDTests.swift */; };
@@ -38,6 +39,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		991C3F94283561FB00F3BF20 /* ModelID+Pasteboard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ModelID+Pasteboard.swift"; sourceTree = "<group>"; };
 		9965130D2804451300C913E6 /* ModelCollectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModelCollectionTests.swift; sourceTree = "<group>"; };
 		9965130E2804451300C913E6 /* ModelObjectTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModelObjectTests.swift; sourceTree = "<group>"; };
 		9965130F2804451300C913E6 /* ModelIDTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModelIDTests.swift; sourceTree = "<group>"; };
@@ -118,6 +120,7 @@
 				99CC5B7427F1F0120084ADFF /* ModelRelationship.swift */,
 				99CC5B7627F1F0120084ADFF /* ModelSettings.swift */,
 				99CC5B7827F1F0120084ADFF /* ModelID.swift */,
+				991C3F94283561FB00F3BF20 /* ModelID+Pasteboard.swift */,
 				99CC5B5C27F1EFE80084ADFF /* M3Data.docc */,
 			);
 			path = M3Data;
@@ -252,6 +255,7 @@
 				99CC5B7D27F1F0120084ADFF /* ModelSettings.swift in Sources */,
 				99CC5B5D27F1EFE80084ADFF /* M3Data.docc in Sources */,
 				99CC5B7F27F1F0120084ADFF /* ModelID.swift in Sources */,
+				991C3F95283561FB00F3BF20 /* ModelID+Pasteboard.swift in Sources */,
 				99CC5B7E27F1F0120084ADFF /* ModelCollection.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

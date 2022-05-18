@@ -6,7 +6,7 @@
 //  Copyright © 2019 M Cubed Software. All rights reserved.
 //
 
-import AppKit
+import Foundation
 
 /// Used for determining model type
 public struct ModelType: RawRepresentable, Equatable, Hashable {
@@ -37,36 +37,6 @@ public struct ModelID: Equatable, Hashable {
             return nil
         }
         self.init(modelType: modelType, uuid: uuid)
-    }
-}
-
-
-//MARK: - Pasteboard Conversion
-extension ModelID {
-    private static let UUIDKey = "uuid"
-    private static let modelTypeKey = "modelType"
-
-    public static let PasteboardType = NSPasteboard.PasteboardType("com.mcubedsw.Coppice.modelID")
-    public var pasteboardItem: NSPasteboardItem {
-        let pasteboardItem = NSPasteboardItem()
-        pasteboardItem.setPropertyList(self.plistRepresentation, forType: ModelID.PasteboardType)
-        return pasteboardItem
-    }
-
-    public var plistRepresentation: Any {
-        return [ModelID.UUIDKey: self.uuid.uuidString, ModelID.modelTypeKey: self.modelType.rawValue]
-    }
-
-    public init?(pasteboardItem: NSPasteboardItem) {
-        guard pasteboardItem.types.contains(ModelID.PasteboardType),
-            let propertyList = pasteboardItem.propertyList(forType: ModelID.PasteboardType) as? [String: String],
-            let uuidString = propertyList[ModelID.UUIDKey],
-            let modelTypeString = propertyList[ModelID.modelTypeKey],
-            let modelType = ModelType(rawValue: modelTypeString)
-        else {
-                return nil
-        }
-        self.init(modelType: modelType, uuidString: uuidString)
     }
 }
 
