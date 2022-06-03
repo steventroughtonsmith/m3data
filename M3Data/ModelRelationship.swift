@@ -10,7 +10,7 @@ import Foundation
 
 @propertyWrapper
 public struct ModelObjectReference<T: CollectableModelObject> {
-    var modelID: ModelID?
+    public var modelID: ModelID?
     public var modelController: ModelController?
 
     public init() {}

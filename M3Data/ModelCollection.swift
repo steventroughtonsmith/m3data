@@ -100,11 +100,10 @@ public class ModelCollection<ModelType: CollectableModelObject> {
         self.modelController?.pushChangeGroup()
         let newObject = ModelType()
         newObject.collection = self
-        self.insert(newObject)
         self.disableUndo {
             setupBlock?(newObject)
         }
-        self.notifyOfChange(to: newObject, changeType: .insert)
+        self.insert(newObject)
         self.modelController?.popChangeGroup()
         return newObject
     }
