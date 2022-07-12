@@ -100,15 +100,17 @@ public class ModelCollection<ModelType: CollectableModelObject> {
         self.modelController?.pushChangeGroup()
         let newObject = ModelType()
         newObject.collection = self
+
+        self.insert(newObject, notifyOfChange: false)
         self.disableUndo {
             setupBlock?(newObject)
         }
-        self.insert(newObject)
+        self.notifyOfChange(to: newObject, changeType: .insert)
         self.modelController?.popChangeGroup()
         return newObject
     }
 
-    private func insert(_ object: ModelType) {
+    private func insert(_ object: ModelType, notifyOfChange: Bool = true) {
         self.all.insert(object)
 
         self.registerUndoAction() { collection in
@@ -118,7 +120,10 @@ public class ModelCollection<ModelType: CollectableModelObject> {
         self.disableUndo {
             object.objectWasInserted()
         }
-        self.notifyOfChange(to: object, changeType: .insert)
+
+        if (notifyOfChange) {
+            self.notifyOfChange(to: object, changeType: .insert)
+        }
     }
 
     public func delete(_ object: ModelType) {
