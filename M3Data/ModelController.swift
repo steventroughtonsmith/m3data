@@ -10,13 +10,15 @@ import Foundation
 
 public protocol ModelController: AnyObject, ModelChangeGroupHandler {
     var undoManager: UndoManager { get }
-    var allCollections: [ModelType: Any] { get set }
+    var allCollections: [ModelType: AnyModelCollection] { get set }
     var settings: ModelSettings { get }
+
     @discardableResult func addModelCollection<T: CollectableModelObject>(for type: T.Type) -> ModelCollection<T>
     func removeModelCollection<T: CollectableModelObject>(for type: T.Type)
 
     func collection<T: CollectableModelObject>(for type: T.Type) -> ModelCollection<T>
-    func object(with id: ModelID) -> ModelObject?
+    func anyCollection(for modelType: ModelType) -> AnyModelCollection
+    func object(with id: ModelID) -> (any CollectableModelObject)?
 
     func disableUndo(_ caller: () throws -> Void) rethrows
 }
@@ -25,7 +27,7 @@ extension ModelController {
     @discardableResult public func addModelCollection<T: CollectableModelObject>(for type: T.Type) -> ModelCollection<T> {
         let modelCollection = ModelCollection<T>()
         modelCollection.modelController = self
-        self.allCollections[type.modelType] = modelCollection
+        self.allCollections[type.modelType] = modelCollection.toAnyModelCollection()
         return modelCollection
     }
 
@@ -34,10 +36,21 @@ extension ModelController {
     }
 
     public func collection<T: CollectableModelObject>(for type: T.Type) -> ModelCollection<T> {
-        guard let model = self.allCollections[type.modelType] as? ModelCollection<T> else {
+        guard let model = self.allCollections[type.modelType]?.modelCollection as? ModelCollection<T> else {
             preconditionFailure("Collection with type '\(type.modelType)' does not exist")
         }
         return model
+    }
+
+    public func anyCollection(for modelType: ModelType) -> AnyModelCollection {
+        guard let collection = self.allCollections[modelType] else {
+            preconditionFailure("Collection with type '\(modelType)' does not exist")
+        }
+        return collection
+    }
+
+    public func object(with id: ModelID) -> (any CollectableModelObject)? {
+        return self.anyCollection(for: id.modelType).objectWithID(id)
     }
 
     public func pushChangeGroup() {

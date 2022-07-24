@@ -102,7 +102,7 @@ public class ModelCollection<ModelType: CollectableModelObject> {
         newObject.collection = self
 
         self.insert(newObject, notifyOfChange: false)
-        self.disableUndo {
+        self.disable([.undo, .change]) {
             setupBlock?(newObject)
         }
         self.notifyOfChange(to: newObject, changeType: .insert)
@@ -146,6 +146,26 @@ public class ModelCollection<ModelType: CollectableModelObject> {
     }
 
 
+    //MARK: - Capabilities
+    public func disable(_ capablities: ModelCollectionCapabilities, _ caller: () throws -> Void) rethrows {
+        if capablities.contains(.undo) {
+            self.modelController?.undoManager.disableUndoRegistration()
+        }
+        if capablities.contains(.change) {
+            self.changeRegistrationEnabled = false
+        }
+
+        try caller()
+
+        if capablities.contains(.undo) {
+            self.modelController?.undoManager.enableUndoRegistration()
+        }
+        if capablities.contains(.change) {
+            self.changeRegistrationEnabled = true
+        }
+    }
+
+
     //MARK: - Observation
     private var observers = [Observation]()
 
@@ -161,7 +181,13 @@ public class ModelCollection<ModelType: CollectableModelObject> {
         }
     }
 
+    private var changeRegistrationEnabled = true
+
     public func notifyOfChange(to object: ModelType, changeType: ModelChangeType = .update, keyPath: PartialKeyPath<ModelType>? = nil) {
+        guard self.changeRegistrationEnabled else {
+            return
+        }
+
         guard let currentChangeGroup = self.changeGroups.last else {
             let changeGroup = ChangeGroup()
             changeGroup.registerChange(to: object, changeType: changeType, keyPath: keyPath)
@@ -176,14 +202,7 @@ public class ModelCollection<ModelType: CollectableModelObject> {
 
     //MARK: - Undo
     public func disableUndo(_ caller: () throws -> Void) rethrows {
-        guard let undoManager = self.modelController?.undoManager else {
-            try caller()
-            return
-        }
-
-        undoManager.disableUndoRegistration()
-        try caller()
-        undoManager.enableUndoRegistration()
+        try self.disable(.undo, caller)
     }
 
     public func registerUndoAction(withName name: String? = nil, invocationBlock: @escaping (ModelCollection<ModelType>) -> Void) {
@@ -213,5 +232,97 @@ extension ModelCollection: ModelChangeGroupHandler {
     public func popChangeGroup() {
         let changeGroup = self.changeGroups.popLast()
         changeGroup?.notify(self.observers)
+    }
+}
+
+//MARK: - Type Erasure
+public class AnyModelCollection {
+    public let modelCollection: Any
+    init(modelCollection: Any) {
+        self.modelCollection = modelCollection
+    }
+
+    fileprivate var allImp: (() -> [any CollectableModelObject])?
+    public var all: [any CollectableModelObject] {
+        return allImp?() ?? []
+    }
+
+    fileprivate var objectWithIDImp: ((ModelID) -> (any CollectableModelObject)?)?
+    public func objectWithID(_ id: ModelID) -> (any CollectableModelObject)? {
+        return self.objectWithIDImp?(id)
+    }
+
+    fileprivate var containsObjectImp: ((any CollectableModelObject) -> Bool)?
+    public func contains(_ object: any CollectableModelObject) -> Bool {
+        return self.containsObjectImp?(object) ?? false
+    }
+
+    fileprivate var disableUndoImp: ((() throws -> Void) -> Void)?
+    public func disableUndo(_ caller: () throws -> Void) {
+        self.disableUndoImp?(caller)
+    }
+
+    fileprivate var deleteImp: ((any CollectableModelObject) -> Void)?
+    public func delete(_ object: any CollectableModelObject) {
+        self.deleteImp?(object)
+    }
+
+    public typealias ModelSetupBlock = (any CollectableModelObject) -> Void
+    fileprivate var newObjectImp: (((ModelSetupBlock)?) -> (any CollectableModelObject))?
+    @discardableResult public func newObject(setupBlock: (ModelSetupBlock)? = nil) -> any CollectableModelObject {
+        return self.newObjectImp!(setupBlock)
+    }
+}
+
+extension ModelCollection {
+    func toAnyModelCollection() -> AnyModelCollection {
+        let anyCollection = AnyModelCollection(modelCollection: self)
+
+        anyCollection.allImp = {
+            return Array(self.all)
+        }
+
+        anyCollection.objectWithIDImp = { modelID in
+            return self.objectWithID(modelID)
+        }
+
+        anyCollection.containsObjectImp = { object in
+            guard let typedObject = object as? ModelType else {
+                return false
+            }
+            return self.contains(typedObject)
+        }
+
+        anyCollection.disableUndoImp = { closure in
+            do {
+                try self.disableUndo(closure)
+            } catch {
+
+            }
+        }
+
+        anyCollection.deleteImp = { object in
+            guard let typedObject = object as? ModelType else {
+                return
+            }
+            self.delete(typedObject)
+        }
+
+        anyCollection.newObjectImp = { setupBlock in
+            return self.newObject(setupBlock: setupBlock)
+        }
+
+        return anyCollection
+    }
+}
+
+public struct ModelCollectionCapabilities: OptionSet {
+    public let rawValue: UInt
+
+    public static let undo = ModelCollectionCapabilities(rawValue: 1 << 0)
+    public static let change = ModelCollectionCapabilities(rawValue: 1 << 1)
+
+    public init(rawValue: UInt) {
+        self.rawValue = rawValue
     }
 }

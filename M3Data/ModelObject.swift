@@ -14,6 +14,17 @@ public enum ModelObjectUpdateErrors: Error, Equatable {
     case modelControllerNotSet
 }
 
+public struct ModelPlistKey: RawRepresentable, Hashable {
+    public let rawValue: String
+    public init?(rawValue: String) {
+        self.rawValue = rawValue;
+    }
+}
+
+extension ModelPlistKey {
+    static let id = ModelPlistKey(rawValue: "id")!
+}
+
 //MARK: -
 /// The protocol root for model objects, used where generics can't be
 public protocol ModelObject: AnyObject {
@@ -24,19 +35,19 @@ public protocol ModelObject: AnyObject {
 
     init()
 
-    var otherProperties: [String: Any] { get }
+    var otherProperties: [ModelPlistKey: Any] { get }
 
     static func modelID(with: UUID) -> ModelID
     static func modelID(withUUIDString: String) -> ModelID?
 
     //MARK: - Plist
-    var plistRepresentation: [String: Any] { get }
+    var plistRepresentation: [ModelPlistKey: Any] { get }
 
     /// Update the model using the supplied Plist values.
     ///
     /// Implementations should check the plist to see if IDs match before updating
     /// - Parameter plist: The plist to update
-    func update(fromPlistRepresentation plist: [String: Any]) throws
+    func update(fromPlistRepresentation plist: [ModelPlistKey: Any]) throws
 
     static var modelFileProperties: [String] { get }
 }

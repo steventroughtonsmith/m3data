@@ -16,6 +16,9 @@
 		996513192804453200C913E6 /* XCTestExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 996513182804453200C913E6 /* XCTestExtensions.swift */; };
 		9965131A2804453200C913E6 /* Mocking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 996513172804453200C913E6 /* Mocking.swift */; };
 		9965131D2804457700C913E6 /* TestObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9965131C2804457700C913E6 /* TestObjects.swift */; };
+		998A516E288D788300997287 /* ModelPlist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 998A516D288D788300997287 /* ModelPlist.swift */; };
+		998A5170288D850900997287 /* ModelPlistTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 998A516F288D850900997287 /* ModelPlistTests.swift */; };
+		998A5172288D976500997287 /* Array+M3Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 998A5171288D976500997287 /* Array+M3Extensions.swift */; };
 		99CC5B5D27F1EFE80084ADFF /* M3Data.docc in Sources */ = {isa = PBXBuildFile; fileRef = 99CC5B5C27F1EFE80084ADFF /* M3Data.docc */; };
 		99CC5B6327F1EFE80084ADFF /* M3Data.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 99CC5B5827F1EFE80084ADFF /* M3Data.framework */; };
 		99CC5B6927F1EFE80084ADFF /* M3Data.h in Headers */ = {isa = PBXBuildFile; fileRef = 99CC5B5B27F1EFE80084ADFF /* M3Data.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -48,6 +51,9 @@
 		996513172804453200C913E6 /* Mocking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mocking.swift; sourceTree = "<group>"; };
 		996513182804453200C913E6 /* XCTestExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XCTestExtensions.swift; sourceTree = "<group>"; };
 		9965131C2804457700C913E6 /* TestObjects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestObjects.swift; sourceTree = "<group>"; };
+		998A516D288D788300997287 /* ModelPlist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelPlist.swift; sourceTree = "<group>"; };
+		998A516F288D850900997287 /* ModelPlistTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelPlistTests.swift; sourceTree = "<group>"; };
+		998A5171288D976500997287 /* Array+M3Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Array+M3Extensions.swift"; sourceTree = "<group>"; };
 		99CC5B5827F1EFE80084ADFF /* M3Data.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = M3Data.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		99CC5B5B27F1EFE80084ADFF /* M3Data.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = M3Data.h; sourceTree = "<group>"; };
 		99CC5B5C27F1EFE80084ADFF /* M3Data.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = M3Data.docc; sourceTree = "<group>"; };
@@ -121,6 +127,7 @@
 				99CC5B7627F1F0120084ADFF /* ModelSettings.swift */,
 				99CC5B7827F1F0120084ADFF /* ModelID.swift */,
 				991C3F94283561FB00F3BF20 /* ModelID+Pasteboard.swift */,
+				998A516D288D788300997287 /* ModelPlist.swift */,
 				99CC5B5C27F1EFE80084ADFF /* M3Data.docc */,
 			);
 			path = M3Data;
@@ -129,12 +136,14 @@
 		99CC5B6627F1EFE80084ADFF /* M3DataTests */ = {
 			isa = PBXGroup;
 			children = (
+				998A5171288D976500997287 /* Array+M3Extensions.swift */,
 				9965131B2804453800C913E6 /* Helpers */,
 				996513112804451300C913E6 /* ModelControllerTests.swift */,
 				996513102804451300C913E6 /* ModelSettingsTests.swift */,
 				9965130F2804451300C913E6 /* ModelIDTests.swift */,
 				9965130D2804451300C913E6 /* ModelCollectionTests.swift */,
 				9965130E2804451300C913E6 /* ModelObjectTests.swift */,
+				998A516F288D850900997287 /* ModelPlistTests.swift */,
 			);
 			path = M3DataTests;
 			sourceTree = "<group>";
@@ -256,6 +265,7 @@
 				99CC5B5D27F1EFE80084ADFF /* M3Data.docc in Sources */,
 				99CC5B7F27F1F0120084ADFF /* ModelID.swift in Sources */,
 				991C3F95283561FB00F3BF20 /* ModelID+Pasteboard.swift in Sources */,
+				998A516E288D788300997287 /* ModelPlist.swift in Sources */,
 				99CC5B7E27F1F0120084ADFF /* ModelCollection.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -265,7 +275,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				996513132804451300C913E6 /* ModelObjectTests.swift in Sources */,
+				998A5170288D850900997287 /* ModelPlistTests.swift in Sources */,
 				996513162804451300C913E6 /* ModelControllerTests.swift in Sources */,
+				998A5172288D976500997287 /* Array+M3Extensions.swift in Sources */,
 				996513152804451300C913E6 /* ModelSettingsTests.swift in Sources */,
 				996513142804451300C913E6 /* ModelIDTests.swift in Sources */,
 				9965131A2804453200C913E6 /* Mocking.swift in Sources */,

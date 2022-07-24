@@ -20,7 +20,7 @@ class ModelControllerTests: XCTestCase {
     func test_addModelCollectionForType_returnsModelCollectionThatWasAddedToAllCollections() {
         let modelController = ModelControllerForTests()
         let collection = modelController.addModelCollection(for: TestCollectableModelObject.self)
-        XCTAssertTrue(modelController.allCollections[TestCollectableModelObject.modelType] as? ModelCollection<TestCollectableModelObject> === collection)
+        XCTAssertTrue(modelController.allCollections[TestCollectableModelObject.modelType]?.modelCollection as? ModelCollection<TestCollectableModelObject> === collection)
     }
 
     func test_addModelCollectionForType_setsModelControllerOfNewCollectionToSelf() {
@@ -80,7 +80,7 @@ class ModelControllerTests: XCTestCase {
 class ModelControllerForTests: ModelController {
     let undoManager: UndoManager = UndoManager()
 
-    var allCollections: [ModelType: Any] = [:]
+    var allCollections: [ModelType: AnyModelCollection] = [:]
 
     var settings = ModelSettings()
 

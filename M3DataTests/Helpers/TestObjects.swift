@@ -6,16 +6,15 @@
 //  Copyright © 2019 M Cubed Software. All rights reserved.
 //
 
-@testable import CoppiceCore
 import M3Data
 import Foundation
 
 class TestModelObject: ModelObject {
-    var plistRepresentation = [String: Any]()
+    var plistRepresentation = [ModelPlistKey: Any]()
 
-    var otherProperties = [String: Any]()
+    var otherProperties = [ModelPlistKey: Any]()
 
-    func update(fromPlistRepresentation plist: [String: Any]) {}
+    func update(fromPlistRepresentation plist: [ModelPlistKey: Any]) {}
 
     static var modelType: ModelType = ModelType("Test")!
 
@@ -27,11 +26,11 @@ class TestModelObject: ModelObject {
 }
 
 final class TestCollectableModelObject: NSObject, CollectableModelObject {
-    var plistRepresentation = [String: Any]()
+    var plistRepresentation = [ModelPlistKey: Any]()
 
-    var otherProperties = [String: Any]()
+    var otherProperties = [ModelPlistKey: Any]()
 
-    func update(fromPlistRepresentation plist: [String: Any]) {}
+    func update(fromPlistRepresentation plist: [ModelPlistKey: Any]) {}
 
     var collection: ModelCollection<TestCollectableModelObject>?
 
@@ -72,10 +71,10 @@ final class TestCollectableModelObject: NSObject, CollectableModelObject {
 }
 
 final class RelationshipModelObject: NSObject, CollectableModelObject {
-    var plistRepresentation = [String: Any]()
-    var otherProperties = [String: Any]()
+    var plistRepresentation = [ModelPlistKey: Any]()
+    var otherProperties = [ModelPlistKey: Any]()
 
-    func update(fromPlistRepresentation plist: [String: Any]) {}
+    func update(fromPlistRepresentation plist: [ModelPlistKey: Any]) {}
 
     var collection: ModelCollection<RelationshipModelObject>?
 
@@ -92,7 +91,7 @@ class TestModelController: NSObject, ModelController {
     var settings = ModelSettings()
 
     var undoManager = UndoManager()
-    var allCollections = [ModelType: Any]()
+    var allCollections = [ModelType: AnyModelCollection]()
 
     func object(with id: ModelID) -> ModelObject? {
         return self.collection(for: TestCollectableModelObject.self).objectWithID(id)

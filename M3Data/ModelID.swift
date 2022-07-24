@@ -13,12 +13,19 @@ public struct ModelType: RawRepresentable, Equatable, Hashable {
     public typealias RawValue = String
 
     public let rawValue: String
-    public init?(_ rawValue: String) {
-        self.init(rawValue: rawValue)
-    }
+    public let persistenceName: String
 
     public init?(rawValue: String) {
+        self.init(rawValue: rawValue, persistenceName: rawValue)
+    }
+
+    public init?(_ rawValue: String, persistenceName: String? = nil) {
+        self.init(rawValue: rawValue, persistenceName: persistenceName)
+    }
+
+    public init?(rawValue: String, persistenceName: String? = nil) {
         self.rawValue = rawValue
+        self.persistenceName = persistenceName ?? rawValue
     }
 }
 
