@@ -162,16 +162,17 @@ final class ModelPlistTests: XCTestCase {
 
 //MARK: - Helpers
 extension ModelPlistTests {
-    static let pageModelType = ModelType(rawValue: "Page", persistenceName: "pages")!
-    static let canvasModelType = ModelType(rawValue: "Canvas", persistenceName: "canvases")!
+    static let pageModelType = ModelType(rawValue: "Page")!
+    static let canvasModelType = ModelType(rawValue: "Canvas")!
 
     class TestModelPlist: ModelPlist {
         override class var version: Int {
             return 4
         }
 
-        override class var supportedModelTypes: [ModelType] {
-            return [ModelPlistTests.pageModelType, ModelPlistTests.canvasModelType]
+        override class var supportedTypes: [PersistenceTypes] {
+            return [.init(modelType: ModelPlistTests.pageModelType, persistenceName: "pages"),
+                    .init(modelType: ModelPlistTests.canvasModelType, persistenceName: "canvases")]
         }
     }
 }

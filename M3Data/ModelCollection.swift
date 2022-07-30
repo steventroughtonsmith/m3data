@@ -258,7 +258,7 @@ public class AnyModelCollection {
     }
 
     fileprivate var disableUndoImp: ((() throws -> Void) -> Void)?
-    public func disableUndo(_ caller: () throws -> Void) {
+    public func disableUndo(_ caller: () throws -> Void) rethrows {
         self.disableUndoImp?(caller)
     }
 

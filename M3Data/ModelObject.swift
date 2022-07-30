@@ -22,7 +22,7 @@ public struct ModelPlistKey: RawRepresentable, Hashable {
 }
 
 extension ModelPlistKey {
-    static let id = ModelPlistKey(rawValue: "id")!
+    public static let id = ModelPlistKey(rawValue: "id")!
 }
 
 //MARK: -
@@ -49,7 +49,7 @@ public protocol ModelObject: AnyObject {
     /// - Parameter plist: The plist to update
     func update(fromPlistRepresentation plist: [ModelPlistKey: Any]) throws
 
-    static var modelFileProperties: [String] { get }
+    static var modelFileProperties: [ModelPlistKey] { get }
 }
 
 
@@ -62,12 +62,16 @@ extension ModelObject {
         return ModelID(modelType: self.modelType, uuidString: uuidString)
     }
 
-    public static var modelFileProperties: [String] {
+    public static var modelFileProperties: [ModelPlistKey] {
         return []
     }
 
     public var undoManager: UndoManager? {
         return self.modelController?.undoManager
+    }
+
+    public var modelFileProperties: [ModelPlistKey] {
+        return Self.modelFileProperties
     }
 }
 
