@@ -97,6 +97,7 @@ extension ModelPlist {
         case invalidCollection(String)
         case missingID([String: Any])
         case migrationNotAvailable
+        case migrationFailed(String)
     }
 }
 
