@@ -41,7 +41,7 @@ open class ModelPlist {
                 throw Errors.missingCollection(persistenceTypes.persistenceName)
             }
 
-            let plistRepresentation = modelPlists.map(\.toModelPlistRepresentation)
+            let plistRepresentation = try modelPlists.map { try $0.toModelPlistRepresentation }
             try self.setPlistRepresentations(plistRepresentation, for: persistenceTypes.modelType)
         }
     }
@@ -91,25 +91,32 @@ open class ModelPlist {
 }
 
 extension ModelPlist {
-    enum Errors: Error, Equatable {
+    public enum Errors: Error {
         case invalidVersion(received: Int, expected: Int)
         case missingCollection(String)
         case invalidCollection(String)
+        case missingID([String: Any])
+        case migrationNotAvailable
     }
 }
 
 extension Dictionary where Key == String, Value == Any {
     var toModelPlistRepresentation: [ModelPlistKey: Any] {
-        var modelPlistKeys = [ModelPlistKey: Any]()
-        for (key, value) in self {
-            let plistKey = ModelPlistKey(rawValue: key)!
-            if (plistKey == .id), let rawModelID = value as? String, let modelID = ModelID(string: rawModelID) {
-                modelPlistKeys[plistKey] = modelID
-            } else {
-                modelPlistKeys[plistKey] = value
+        get throws {
+            var modelPlistKeys = [ModelPlistKey: Any]()
+            for (key, value) in self {
+                let plistKey = ModelPlistKey(rawValue: key)!
+                if (plistKey == .id), let rawModelID = value as? String, let modelID = ModelID(string: rawModelID) {
+                    modelPlistKeys[plistKey] = modelID
+                } else {
+                    modelPlistKeys[plistKey] = value
+                }
             }
+            guard modelPlistKeys[.id] != nil else {
+                throw ModelPlist.Errors.missingID(self)
+            }
+            return modelPlistKeys
         }
-        return modelPlistKeys
     }
 }
 
@@ -124,6 +131,17 @@ extension Dictionary where Key == ModelPlistKey, Value == Any {
             }
         }
         return stringKeys
+    }
+
+    public func attribute<T>(withKey key: ModelPlistKey) -> T? {
+        return self[key] as? T
+    }
+
+    public func requiredAttribute<T>(withKey key: ModelPlistKey) throws -> T {
+        guard let value: T = self.attribute(withKey: key) else {
+            throw ModelObjectUpdateErrors.attributeNotFound(key.rawValue)
+        }
+        return value
     }
 }
 

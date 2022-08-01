@@ -257,9 +257,9 @@ public class AnyModelCollection {
         return self.containsObjectImp?(object) ?? false
     }
 
-    fileprivate var disableUndoImp: ((() throws -> Void) -> Void)?
-    public func disableUndo(_ caller: () throws -> Void) rethrows {
-        self.disableUndoImp?(caller)
+    fileprivate var disableUndoImp: ((() throws -> Void) throws -> Void)?
+    public func disableUndo(_ caller: () throws -> Void) throws {
+        try self.disableUndoImp?(caller)
     }
 
     fileprivate var deleteImp: ((any CollectableModelObject) -> Void)?
@@ -294,11 +294,7 @@ extension ModelCollection {
         }
 
         anyCollection.disableUndoImp = { closure in
-            do {
-                try self.disableUndo(closure)
-            } catch {
-
-            }
+            try self.disableUndo(closure)
         }
 
         anyCollection.deleteImp = { object in

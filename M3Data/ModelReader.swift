@@ -47,8 +47,6 @@ public class ModelReader {
         for (modelType, collection) in self.modelController.allCollections {
             try self.updateObjects(in: collection, using: plist.plistRepresentations(of: modelType), content: contentWrapper?.fileWrappers)
         }
-
-
     }
 
     private func plistTypes(fromVersion version: Int) -> [ModelPlist.Type] {
@@ -67,7 +65,7 @@ public class ModelReader {
     }
 
     private func createAndDeleteObjects(in collection: AnyModelCollection, using plistRepresentations: [[ModelPlistKey: Any]]) {
-        collection.disableUndo {
+        try? collection.disableUndo {
             let existingIDs = Set(collection.all.map { $0.id })
             let newIDs = Set(plistRepresentations.compactMap { $0[.id] as? ModelID })
 
