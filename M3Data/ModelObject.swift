@@ -25,6 +25,12 @@ extension ModelPlistKey {
     public static let id = ModelPlistKey(rawValue: "id")!
 }
 
+public enum ModelPropertyConversion {
+    case modelID
+    case modelIDArray
+    case modelFile
+}
+
 //MARK: -
 /// The protocol root for model objects, used where generics can't be
 public protocol ModelObject: AnyObject {
@@ -49,7 +55,7 @@ public protocol ModelObject: AnyObject {
     /// - Parameter plist: The plist to update
     func update(fromPlistRepresentation plist: [ModelPlistKey: Any]) throws
 
-    static var modelFileProperties: [ModelPlistKey] { get }
+    static var propertyConversions: [ModelPlistKey: ModelPropertyConversion] { get }
 }
 
 
@@ -62,16 +68,16 @@ extension ModelObject {
         return ModelID(modelType: self.modelType, uuidString: uuidString)
     }
 
-    public static var modelFileProperties: [ModelPlistKey] {
-        return []
-    }
-
     public var undoManager: UndoManager? {
         return self.modelController?.undoManager
     }
 
-    public var modelFileProperties: [ModelPlistKey] {
-        return Self.modelFileProperties
+    public static var propertyConversions: [ModelPlistKey: ModelPropertyConversion] {
+        return [:]
+    }
+
+    var propertyConversions: [ModelPlistKey: ModelPropertyConversion] {
+        return Self.propertyConversions
     }
 }
 

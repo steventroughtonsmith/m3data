@@ -41,13 +41,27 @@ public class ModelWriter {
         //We'll sort the items so we get a somewhat deterministic ordering on disk
         let sortedItems = self.modelController.anyCollection(for: modelType).all.sorted { $0.id.uuid.uuidString < $1.id.uuid.uuidString }
         sortedItems.forEach { (object) in
-            let plist = object.plistRepresentation.mapValues { (value) -> Any in
-                guard let file = value as? ModelFile else {
-                    return value
-                }
+            var plist = object.plistRepresentation
 
-                files.append(file)
-                return file.plistRepresentation
+            for (plistKey, conversion) in object.propertyConversions {
+                guard let value = plist[plistKey] else {
+                    continue
+                }
+                switch conversion {
+                case .modelID:
+                    if let modelID = value as? ModelID {
+                        plist[plistKey] = modelID.stringRepresentation
+                    }
+                case .modelIDArray:
+                    if let modelIDArray = value as? [ModelID] {
+                        plist[plistKey] = modelIDArray.map(\.stringRepresentation)
+                    }
+                case .modelFile:
+                    if let modelFile = value as? ModelFile {
+                        plist[plistKey] = modelFile.plistRepresentation
+                        files.append(modelFile)
+                    }
+                }
             }
             plistItems.append(plist)
         }

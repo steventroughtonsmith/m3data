@@ -94,27 +94,65 @@ public class ModelReader {
                     return
                 }
 
-
-                var plistItemWithModelFiles = plistRepresentation
-                for modelFileProperty in item.modelFileProperties {
-                    let modelFilePlist = plistItemWithModelFiles[modelFileProperty] as? [String: Any]
-                    guard let type = modelFilePlist?["type"] as? String else {
+                var convertedPlist = plistRepresentation
+                for (plistKey, conversion) in item.propertyConversions {
+                    guard let value = convertedPlist[plistKey] else {
                         continue
                     }
-
-                    let metadata = modelFilePlist?["metadata"] as? [String: Any]
-                    let modelFile: ModelFile
-                    if let filename = modelFilePlist?["filename"] as? String {
-                        let data = content?[filename]?.regularFileContents
-                        modelFile = ModelFile(type: type, filename: filename, data: data, metadata: metadata)
-                    } else {
-                        modelFile = ModelFile(type: type, filename: nil, data: nil, metadata: metadata)
+                    switch conversion {
+                    case .modelID:
+                        if let modelID = self.convertToModelID(value) {
+                            convertedPlist[plistKey] = modelID
+                        }
+                    case .modelIDArray:
+                        if let modelIDArray = self.convertToModelIDArray(value) {
+                            convertedPlist[plistKey] = modelIDArray
+                        }
+                    case .modelFile:
+                        if let modelFile = self.convertToModelFile(value, content: content) {
+                            convertedPlist[plistKey] = modelFile
+                        }
                     }
-
-                    plistItemWithModelFiles[modelFileProperty] = modelFile
                 }
-                try item.update(fromPlistRepresentation: plistItemWithModelFiles)
+
+                try item.update(fromPlistRepresentation: convertedPlist)
             }
         }
+    }
+
+    private func convertToModelFile(_ propertyValue: Any, content: [String: FileWrapper]?) -> ModelFile? {
+        let modelFilePlist = propertyValue as? [String: Any]
+        guard let type = modelFilePlist?["type"] as? String else {
+            return nil
+        }
+
+        let metadata = modelFilePlist?["metadata"] as? [String: Any]
+        let modelFile: ModelFile
+        if let filename = modelFilePlist?["filename"] as? String {
+            let data = content?[filename]?.regularFileContents
+            modelFile = ModelFile(type: type, filename: filename, data: data, metadata: metadata)
+        } else {
+            modelFile = ModelFile(type: type, filename: nil, data: nil, metadata: metadata)
+        }
+
+        return modelFile
+    }
+
+    private func convertToModelID(_ propertyValue: Any) -> ModelID? {
+        guard let modelIDString = propertyValue as? String else {
+            return nil
+        }
+        return ModelID(string: modelIDString)
+    }
+
+    private func convertToModelIDArray(_ propertyValue: Any) -> [ModelID]? {
+        guard let modelIDStrings = propertyValue as? [String] else {
+            return nil
+        }
+        let modelIDs = modelIDStrings.compactMap { ModelID(string: $0) }
+        guard modelIDs.count == modelIDStrings.count else {
+            return nil
+        }
+        return modelIDs
     }
 }
