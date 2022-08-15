@@ -172,6 +172,10 @@ extension CollectableModelObject {
         updateBlock(self)
         self.modelController?.popChangeGroup()
     }
+
+    public func delete() {
+        self.collection?.delete(self)
+    }
 }
 
 
