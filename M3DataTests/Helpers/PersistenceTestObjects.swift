@@ -34,8 +34,8 @@ enum PersistenceTestObjects {
             self.plistRepresentation = plist
         }
 
-        static var modelFileProperties: [ModelPlistKey] {
-            return [ModelPlistKey(rawValue: "image")!]
+        static var propertyConversions: [ModelPlistKey : ModelPropertyConversion] {
+            return [ModelPlistKey(rawValue: "image"): .modelFile]
         }
     }
 
@@ -124,11 +124,11 @@ enum PersistenceTestObjects {
             for animalPlist in self.plistRepresentations(of: Animal.modelType) {
                 var animal = animalPlist
                 if (animal[.id] as? ModelID)?.uuid.uuidString == "4932FB60-6D49-4E15-AFD0-599D32CC5F94" {
-                    animal[ModelPlistKey(rawValue: "lastMeal")!] = "Bob"
+                    animal[ModelPlistKey(rawValue: "lastMeal")] = "Bob"
                 } else if (animal[.id] as? ModelID)?.uuid.uuidString == "5932FB60-6D49-4E15-AFD0-599D32CC5F94" {
-                    animal[ModelPlistKey(rawValue: "lastMeal")!] = "Alice"
+                    animal[ModelPlistKey(rawValue: "lastMeal")] = "Alice"
                 } else if (animal[.id] as? ModelID)?.uuid.uuidString == "6932FB60-6D49-4E15-AFD0-599D32CC5F94" {
-                    animal[ModelPlistKey(rawValue: "lastMeal")!] = "Pilky"
+                    animal[ModelPlistKey(rawValue: "lastMeal")] = "Pilky"
                 }
                 finalAnimals.append(animal.toPersistanceRepresentation)
             }

@@ -43,8 +43,16 @@ final class ModelPlistTests: XCTestCase {
     func test_initWithPlist_throwsErrorIfVersionsDontMatch() throws {
         self.testPlist["version"] = 3
 
-        XCTAssertThrowsError(try TestModelPlist(plist: self.testPlist)) {
-            XCTAssertEqual(($0 as? ModelPlist.Errors), .invalidVersion(received: 3, expected: 4))
+        XCTAssertThrowsError(try TestModelPlist(plist: self.testPlist)) { error in
+            guard
+                let plistError = error as? ModelPlist.Errors,
+                case .invalidVersion(let received, let expected) = plistError
+            else {
+                XCTFail("Incorrect error, got \(error)")
+                return
+            }
+            XCTAssertEqual(received, 3)
+            XCTAssertEqual(expected, 4)
         }
     }
 
@@ -69,8 +77,15 @@ final class ModelPlistTests: XCTestCase {
     func test_initWithPlist_throwsErrorIfSupportedModelTypeIsMissing() throws {
         self.testPlist["canvases"] = nil
 
-        XCTAssertThrowsError(try TestModelPlist(plist: self.testPlist)) {
-            XCTAssertEqual(($0 as? ModelPlist.Errors), .missingCollection("canvases"))
+        XCTAssertThrowsError(try TestModelPlist(plist: self.testPlist)) { error in
+            guard
+                let plistError = error as? ModelPlist.Errors,
+                case .missingCollection(let collectionName) = plistError
+            else {
+                XCTFail("Incorrect error, got \(error)")
+                return
+            }
+            XCTAssertEqual(collectionName, "canvases")
         }
     }
 
@@ -80,11 +95,11 @@ final class ModelPlistTests: XCTestCase {
         let pages = modelPlist.plistRepresentations(of: Self.pageModelType)
         XCTAssertEqual(pages.count, 2)
         XCTAssertEqual(pages[safe: 0]?[.id] as? ModelID, ModelID(modelType: Self.pageModelType, uuidString: "26F8CA72-4EAA-4120-BBAD-2688B47E6C6C"))
-        XCTAssertEqual(pages[safe: 0]?[ModelPlistKey(rawValue: "title")!] as? String, "My Awesome Page")
-        XCTAssertEqual(pages[safe: 0]?[ModelPlistKey(rawValue: "content")!] as? String, "To be written…")
+        XCTAssertEqual(pages[safe: 0]?[ModelPlistKey(rawValue: "title")] as? String, "My Awesome Page")
+        XCTAssertEqual(pages[safe: 0]?[ModelPlistKey(rawValue: "content")] as? String, "To be written…")
         XCTAssertEqual(pages[safe: 1]?[.id] as? ModelID, ModelID(modelType: Self.pageModelType, uuidString: "96F8CA72-4EAA-4120-BBAD-2688B47E6C6C"))
-        XCTAssertEqual(pages[safe: 1]?[ModelPlistKey(rawValue: "title")!] as? String, "All About Possums")
-        XCTAssertEqual(pages[safe: 1]?[ModelPlistKey(rawValue: "content")!] as? String, "They are awesome")
+        XCTAssertEqual(pages[safe: 1]?[ModelPlistKey(rawValue: "title")] as? String, "All About Possums")
+        XCTAssertEqual(pages[safe: 1]?[ModelPlistKey(rawValue: "content")] as? String, "They are awesome")
     }
 
 
@@ -106,12 +121,12 @@ final class ModelPlistTests: XCTestCase {
     func test_plist_includesAllSupportedTypes() throws {
         let modelPlist = TestModelPlist()
         try modelPlist.setPlistRepresentations([
-            [.id: ModelID(modelType: Self.pageModelType, uuidString: "26F8CA72-4EAA-4120-BBAD-2688B47E6C6C")!, ModelPlistKey(rawValue: "title")!: "Page 1"],
-            [.id: ModelID(modelType: Self.pageModelType, uuidString: "96F8CA72-4EAA-4120-BBAD-2688B47E6C6C")!, ModelPlistKey(rawValue: "title")!: "Page 2"]
+            [.id: ModelID(modelType: Self.pageModelType, uuidString: "26F8CA72-4EAA-4120-BBAD-2688B47E6C6C")!, ModelPlistKey(rawValue: "title"): "Page 1"],
+            [.id: ModelID(modelType: Self.pageModelType, uuidString: "96F8CA72-4EAA-4120-BBAD-2688B47E6C6C")!, ModelPlistKey(rawValue: "title"): "Page 2"]
         ], for: Self.pageModelType)
 
         try modelPlist.setPlistRepresentations([
-            [.id: ModelID(modelType: Self.canvasModelType, uuidString: "AAAACA72-4EAA-4120-BBAD-2688B47E6C6C")!, ModelPlistKey(rawValue: "title")!: "My Canvas"]
+            [.id: ModelID(modelType: Self.canvasModelType, uuidString: "AAAACA72-4EAA-4120-BBAD-2688B47E6C6C")!, ModelPlistKey(rawValue: "title"): "My Canvas"]
         ], for: Self.canvasModelType)
 
 
@@ -131,12 +146,12 @@ final class ModelPlistTests: XCTestCase {
     func test_plist_sortsObjectsByID() throws {
         let modelPlist = TestModelPlist()
         try modelPlist.setPlistRepresentations([
-            [.id: ModelID(modelType: Self.pageModelType, uuidString: "96F8CA72-4EAA-4120-BBAD-2688B47E6C6C")!, ModelPlistKey(rawValue: "title")!: "Page 2"],
-            [.id: ModelID(modelType: Self.pageModelType, uuidString: "26F8CA72-4EAA-4120-BBAD-2688B47E6C6C")!, ModelPlistKey(rawValue: "title")!: "Page 1"]
+            [.id: ModelID(modelType: Self.pageModelType, uuidString: "96F8CA72-4EAA-4120-BBAD-2688B47E6C6C")!, ModelPlistKey(rawValue: "title"): "Page 2"],
+            [.id: ModelID(modelType: Self.pageModelType, uuidString: "26F8CA72-4EAA-4120-BBAD-2688B47E6C6C")!, ModelPlistKey(rawValue: "title"): "Page 1"]
         ], for: Self.pageModelType)
 
         try modelPlist.setPlistRepresentations([
-            [.id: ModelID(modelType: Self.canvasModelType, uuidString: "AAAACA72-4EAA-4120-BBAD-2688B47E6C6C")!, ModelPlistKey(rawValue: "title")!: "My Canvas"]
+            [.id: ModelID(modelType: Self.canvasModelType, uuidString: "AAAACA72-4EAA-4120-BBAD-2688B47E6C6C")!, ModelPlistKey(rawValue: "title"): "My Canvas"]
         ], for: Self.canvasModelType)
 
 
@@ -151,8 +166,8 @@ final class ModelPlistTests: XCTestCase {
     func test_plist_includesSupportedTypeEvenIfEmpty() throws {
         let modelPlist = TestModelPlist()
         try modelPlist.setPlistRepresentations([
-            [.id: ModelID(modelType: Self.pageModelType, uuidString: "26F8CA72-4EAA-4120-BBAD-2688B47E6C6C")!, ModelPlistKey(rawValue: "title")!: "Page 1"],
-            [.id: ModelID(modelType: Self.pageModelType, uuidString: "96F8CA72-4EAA-4120-BBAD-2688B47E6C6C")!, ModelPlistKey(rawValue: "title")!: "Page 2"]
+            [.id: ModelID(modelType: Self.pageModelType, uuidString: "26F8CA72-4EAA-4120-BBAD-2688B47E6C6C")!, ModelPlistKey(rawValue: "title"): "Page 1"],
+            [.id: ModelID(modelType: Self.pageModelType, uuidString: "96F8CA72-4EAA-4120-BBAD-2688B47E6C6C")!, ModelPlistKey(rawValue: "title"): "Page 2"]
         ], for: Self.pageModelType)
 
         XCTAssertNotNil(modelPlist.plist["canvases"])

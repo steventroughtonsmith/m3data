@@ -99,24 +99,26 @@ public class ModelReader {
                     guard let value = convertedPlist[plistKey] else {
                         continue
                     }
-                    switch conversion {
-                    case .modelID:
-                        if let modelID = self.convertToModelID(value) {
-                            convertedPlist[plistKey] = modelID
-                        }
-                    case .modelIDArray:
-                        if let modelIDArray = self.convertToModelIDArray(value) {
-                            convertedPlist[plistKey] = modelIDArray
-                        }
-                    case .modelFile:
-                        if let modelFile = self.convertToModelFile(value, content: content) {
-                            convertedPlist[plistKey] = modelFile
-                        }
+                    if let convertedValue = self.apply(conversion, to: value, content: content) {
+                        convertedPlist[plistKey] = convertedValue
                     }
                 }
 
                 try item.update(fromPlistRepresentation: convertedPlist)
             }
+        }
+    }
+
+    private func apply(_ conversion: ModelPropertyConversion, to value: Any, content: [String: FileWrapper]?) -> Any? {
+        switch conversion {
+        case .modelID:
+            return self.convertToModelID(value)
+        case .array(let conversion):
+            return self.convertToArray(value, conversion: conversion, content: content)
+        case .modelFile:
+            return self.convertToModelFile(value, content: content)
+        case .dictionary(let conversions):
+            return self.convertToDictionary(value, conversions: conversions, content: content)
         }
     }
 
@@ -145,14 +147,28 @@ public class ModelReader {
         return ModelID(string: modelIDString)
     }
 
-    private func convertToModelIDArray(_ propertyValue: Any) -> [ModelID]? {
-        guard let modelIDStrings = propertyValue as? [String] else {
+    private func convertToArray(_ propertyValue: Any, conversion: ModelPropertyConversion, content: [String: FileWrapper]?) -> [Any]? {
+        guard let array = propertyValue as? [Any] else {
             return nil
         }
-        let modelIDs = modelIDStrings.compactMap { ModelID(string: $0) }
-        guard modelIDs.count == modelIDStrings.count else {
+
+        return array.map { self.apply(conversion, to: $0, content: content) ?? $0 }
+    }
+
+    private func convertToDictionary(_ propertyValue: Any, conversions: [ModelPlistKey: ModelPropertyConversion], content: [String: FileWrapper]?) -> [ModelPlistKey: Any]? {
+        guard let dictionary = propertyValue as? [String: Any] else {
             return nil
         }
-        return modelIDs
+        var returnDictionary = [ModelPlistKey: Any]()
+        for key in dictionary.keys {
+            let plistKey = ModelPlistKey(rawValue: key)
+            let value = dictionary[key]
+            if let conversion = conversions[plistKey], let convertedValue = self.apply(conversion, to: value as Any, content: content) {
+                returnDictionary[plistKey] = convertedValue
+            } else {
+                returnDictionary[plistKey] = value
+            }
+        }
+        return returnDictionary
     }
 }

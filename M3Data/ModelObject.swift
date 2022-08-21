@@ -16,19 +16,20 @@ public enum ModelObjectUpdateErrors: Error, Equatable {
 
 public struct ModelPlistKey: RawRepresentable, Hashable {
     public let rawValue: String
-    public init?(rawValue: String) {
-        self.rawValue = rawValue;
+    public init(rawValue: String) {
+        self.rawValue = rawValue
     }
 }
 
 extension ModelPlistKey {
-    public static let id = ModelPlistKey(rawValue: "id")!
+    public static let id = ModelPlistKey(rawValue: "id")
 }
 
-public enum ModelPropertyConversion {
+public indirect enum ModelPropertyConversion {
     case modelID
-    case modelIDArray
     case modelFile
+    case array(ModelPropertyConversion)
+    case dictionary([ModelPlistKey: ModelPropertyConversion])
 }
 
 //MARK: -

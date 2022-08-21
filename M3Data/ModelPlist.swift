@@ -106,7 +106,7 @@ extension Dictionary where Key == String, Value == Any {
         get throws {
             var modelPlistKeys = [ModelPlistKey: Any]()
             for (key, value) in self {
-                let plistKey = ModelPlistKey(rawValue: key)!
+                let plistKey = ModelPlistKey(rawValue: key)
                 if (plistKey == .id), let rawModelID = value as? String, let modelID = ModelID(string: rawModelID) {
                     modelPlistKeys[plistKey] = modelID
                 } else {
