@@ -6,9 +6,20 @@
 //
 
 import XCTest
+@testable import M3Data
 
-//TODO: Implement
 final class ModelWriterTests: XCTestCase {
+    var modelController: PersistenceTestObjects.PersistenceModelController!
+    var modelWriter: ModelWriter!
+    var testFileData: Data!
+
+    override func setUpWithError() throws {
+        self.modelController = PersistenceTestObjects.PersistenceModelController()
+        self.modelWriter = ModelWriter(modelController: self.modelController, plist: PersistenceTestObjects.PlistV3.self)
+
+        self.testFileData = try XCTUnwrap(NSImage(named: "NSAddTemplate")?.tiffRepresentation)
+    }
+
     func test_generateFileWrappers_dataPlistContainsAllModelObjects() throws {
         XCTFail()
     }
@@ -18,6 +29,31 @@ final class ModelWriterTests: XCTestCase {
     }
 
     func test_generateFileWrappers_includesDataFilesInContent() throws {
+        XCTFail()
+    }
+
+    //MARK: - Conversions
+    func test_generateFileWrappers_convertsModelIDToString() throws {
+        XCTFail()
+    }
+
+    func test_generateFileWrappers_convertsModelFileToDictionary() throws {
+        XCTFail()
+    }
+
+    func test_generateFileWrappers_convertsArrayOfModelIDsToArrayOfStrings() throws {
+        XCTFail()
+    }
+
+    func test_generateFileWrappers_convertsArrayOfModelFilesToArrayOfStrings() throws {
+        XCTFail()
+    }
+
+    func test_generateFileWrappers_convertsPropertiesInDictionary() throws {
+        XCTFail()
+    }
+
+    func test_generateFileWrappers_doesntConvertDictionaryPropertiesNotListed() throws {
         XCTFail()
     }
 }

@@ -37,11 +37,6 @@
                BlueprintName = "M3DataTests"
                ReferencedContainer = "container:M3Data.xcodeproj">
             </BuildableReference>
-            <SkippedTests>
-               <Test
-                  Identifier = "ModelWriterTests">
-               </Test>
-            </SkippedTests>
          </TestableReference>
       </Testables>
    </TestAction>
