@@ -34,7 +34,12 @@ enum PersistenceTestObjects {
             self.plistRepresentation = plist
         }
 
-        static var propertyConversions: [ModelPlistKey : ModelPropertyConversion] {
+        static var propertyConversionsOverride: [ModelPlistKey: ModelPropertyConversion]?
+
+        static var propertyConversions: [ModelPlistKey: ModelPropertyConversion] {
+            if let propertyConversionsOverride {
+                return propertyConversionsOverride
+            }
             return [ModelPlistKey(rawValue: "image"): .modelFile]
         }
     }
