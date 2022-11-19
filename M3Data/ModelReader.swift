@@ -11,6 +11,7 @@ public class ModelReader {
     public enum Errors: Error, Equatable {
         case invalidPlist
         case versionNotSupported
+        case migrationCancelled
     }
 
     public let modelController: ModelController
@@ -21,7 +22,7 @@ public class ModelReader {
         self.plists = plists.sorted(by: { $0.version < $1.version })
     }
 
-    public func read(plistWrapper: FileWrapper, contentWrapper: FileWrapper?) throws {
+    public func read(plistWrapper: FileWrapper, contentWrapper: FileWrapper?, shouldMigrate: () -> Bool) throws {
         guard
             let plistData = plistWrapper.regularFileContents,
             let plistDict = try? PropertyListSerialization.propertyList(from: plistData, format: nil) as? [String: Any]
@@ -34,6 +35,12 @@ public class ModelReader {
         let plistTypes = self.plistTypes(fromVersion: version)
         guard plistTypes.count > 0 else {
             throw Errors.versionNotSupported
+        }
+
+        if plistTypes.count > 1 {
+            guard shouldMigrate() else {
+                throw Errors.migrationCancelled
+            }
         }
 
         let plist = try self.loadPlist(fromDictionary: plistDict, usingTypes: plistTypes)
