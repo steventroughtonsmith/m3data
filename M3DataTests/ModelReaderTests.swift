@@ -26,7 +26,7 @@ final class ModelReaderTests: XCTestCase {
         let invalidData = try XCTUnwrap(NSImage(named: "NSAddTemplate")?.tiffRepresentation)
         let plistWrapper = FileWrapper(regularFileWithContents: invalidData)
 
-        XCTAssertThrowsError(try self.modelReader.read(plistWrapper: plistWrapper, contentWrapper: nil)) {
+        XCTAssertThrowsError(try self.modelReader.read(plistWrapper: plistWrapper, contentWrapper: nil, shouldMigrate: { true })) {
             XCTAssertEqual(($0 as? ModelReader.Errors), .invalidPlist)
         }
     }
@@ -35,7 +35,7 @@ final class ModelReaderTests: XCTestCase {
         let plist = ["version": 4]
         let plistWrapper = FileWrapper(regularFileWithContents: try PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0))
 
-        XCTAssertThrowsError(try self.modelReader.read(plistWrapper: plistWrapper, contentWrapper: nil)) {
+        XCTAssertThrowsError(try self.modelReader.read(plistWrapper: plistWrapper, contentWrapper: nil, shouldMigrate: { true })) {
             XCTAssertEqual(($0 as? ModelReader.Errors), .versionNotSupported)
         }
     }
@@ -44,7 +44,7 @@ final class ModelReaderTests: XCTestCase {
         let plist = PersistenceTestObjects.PlistV3.samplePlist
         let plistWrapper = FileWrapper(regularFileWithContents: try PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0))
         let contentWrapper = FileWrapper(directoryWithFileWrappers: ["photo.png": FileWrapper(regularFileWithContents: self.testFileData)])
-        XCTAssertNoThrow(try self.modelReader.read(plistWrapper: plistWrapper, contentWrapper: contentWrapper))
+        XCTAssertNoThrow(try self.modelReader.read(plistWrapper: plistWrapper, contentWrapper: contentWrapper, shouldMigrate: { true }))
 
         try validateModelController()
     }
@@ -53,7 +53,7 @@ final class ModelReaderTests: XCTestCase {
         let plist = PersistenceTestObjects.PlistV2.samplePlist
         let plistWrapper = FileWrapper(regularFileWithContents: try PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0))
         let contentWrapper = FileWrapper(directoryWithFileWrappers: ["photo.png": FileWrapper(regularFileWithContents: self.testFileData)])
-        XCTAssertNoThrow(try self.modelReader.read(plistWrapper: plistWrapper, contentWrapper: contentWrapper))
+        XCTAssertNoThrow(try self.modelReader.read(plistWrapper: plistWrapper, contentWrapper: contentWrapper, shouldMigrate: { true }))
 
         try validateModelController()
     }
@@ -62,7 +62,7 @@ final class ModelReaderTests: XCTestCase {
         let plist = PersistenceTestObjects.PlistV1.samplePlist
         let plistWrapper = FileWrapper(regularFileWithContents: try PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0))
         let contentWrapper = FileWrapper(directoryWithFileWrappers: ["photo.png": FileWrapper(regularFileWithContents: self.testFileData)])
-        XCTAssertNoThrow(try self.modelReader.read(plistWrapper: plistWrapper, contentWrapper: contentWrapper))
+        XCTAssertNoThrow(try self.modelReader.read(plistWrapper: plistWrapper, contentWrapper: contentWrapper, shouldMigrate: { true }))
 
         try validateModelController()
     }
