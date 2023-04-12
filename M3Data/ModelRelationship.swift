@@ -40,3 +40,33 @@ public struct ModelObjectReference<T: CollectableModelObject> {
         self.modelController = nil
     }
 }
+
+
+@propertyWrapper
+public struct AnyModelObjectReference {
+    public var modelID: ModelID?
+    public var modelController: ModelController?
+
+    public init() {}
+
+    public var wrappedValue: (any CollectableModelObject)? {
+        get {
+            guard let id = self.modelID else {
+                return nil
+            }
+            return self.modelController?.anyCollection(for: id.modelType).objectWithID(id)
+        }
+        set {
+            self.modelID = newValue?.id
+        }
+    }
+
+    public var projectedValue: Self {
+        get { self }
+        set { self = newValue }
+    }
+
+    public mutating func performCleanUp() {
+        self.modelController = nil
+    }
+}
