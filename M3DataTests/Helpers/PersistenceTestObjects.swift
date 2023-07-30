@@ -14,10 +14,10 @@ enum PersistenceTestObjects {
         var id = ModelID(modelType: Person.modelType)
         var collection: ModelCollection<Person>?
 
-        let otherProperties = [ModelPlistKey : Any]()
-        var plistRepresentation = [ModelPlistKey : Any]()
+        let otherProperties = [ModelPlistKey: Any]()
+        var plistRepresentation = [ModelPlistKey: Any]()
 
-        func update(fromPlistRepresentation plist: [ModelPlistKey : Any]) throws {
+        func update(fromPlistRepresentation plist: [ModelPlistKey: Any]) throws {
             self.plistRepresentation = plist
         }
     }
@@ -27,10 +27,10 @@ enum PersistenceTestObjects {
         var id = ModelID(modelType: Animal.modelType)
         var collection: ModelCollection<Animal>?
 
-        let otherProperties = [ModelPlistKey : Any]()
-        var plistRepresentation = [ModelPlistKey : Any]()
+        let otherProperties = [ModelPlistKey: Any]()
+        var plistRepresentation = [ModelPlistKey: Any]()
 
-        func update(fromPlistRepresentation plist: [ModelPlistKey : Any]) throws {
+        func update(fromPlistRepresentation plist: [ModelPlistKey: Any]) throws {
             self.plistRepresentation = plist
         }
 
@@ -49,10 +49,10 @@ enum PersistenceTestObjects {
         var id = ModelID(modelType: Robot.modelType)
         var collection: ModelCollection<Robot>?
 
-        let otherProperties = [ModelPlistKey : Any]()
-        var plistRepresentation = [ModelPlistKey : Any]()
+        let otherProperties = [ModelPlistKey: Any]()
+        var plistRepresentation = [ModelPlistKey: Any]()
 
-        func update(fromPlistRepresentation plist: [ModelPlistKey : Any]) throws {
+        func update(fromPlistRepresentation plist: [ModelPlistKey: Any]) throws {
             self.plistRepresentation = plist
         }
     }
@@ -76,16 +76,16 @@ enum PersistenceTestObjects {
         override class var supportedTypes: [ModelPlist.PersistenceTypes] {
             return [
                 .init(modelType: Person.modelType, persistenceName: "people"),
-                .init(modelType: Robot.modelType, persistenceName: "robots")
+                .init(modelType: Robot.modelType, persistenceName: "robots"),
             ]
         }
 
-        override func migrateToNextVersion() throws -> [String : Any] {
+        override func migrateToNextVersion() throws -> [String: Any] {
             var plist = self.plist
             plist["animals"] = [
                 ["id": "Animal_4932FB60-6D49-4E15-AFD0-599D32CC5F94", "species": "Birb"],
                 ["id": "Animal_5932FB60-6D49-4E15-AFD0-599D32CC5F94", "species": "Bear"],
-                ["id": "Animal_6932FB60-6D49-4E15-AFD0-599D32CC5F94", "species": "Possum", "image": ["type": "png", "filename": "photo.png", "metadata": ["colour": true]]]
+                ["id": "Animal_6932FB60-6D49-4E15-AFD0-599D32CC5F94", "species": "Possum", "image": ["type": "png", "filename": "photo.png", "metadata": ["colour": true]]],
             ]
             plist["settings"] = ["zoo-efficiency": 90]
             plist["version"] = 2
@@ -99,12 +99,12 @@ enum PersistenceTestObjects {
                 "people": [
                     ["id": "Person_4932FB60-6D49-4E15-AFD0-599D32CC5F94", "name": "Bob"],
                     ["id": "Person_5932FB60-6D49-4E15-AFD0-599D32CC5F94", "name": "Alice"],
-                    ["id": "Person_6932FB60-6D49-4E15-AFD0-599D32CC5F94", "name": "Pilky"]
+                    ["id": "Person_6932FB60-6D49-4E15-AFD0-599D32CC5F94", "name": "Pilky"],
                 ],
                 "robots": [
                     ["id": "Robot_4932FB60-6D49-4E15-AFD0-599D32CC5F94", "name": "PilkyBot"],
                     ["id": "Robot_5932FB60-6D49-4E15-AFD0-599D32CC5F94", "name": "SinisterBot"],
-                ]
+                ],
             ]
         }
     }
@@ -122,7 +122,7 @@ enum PersistenceTestObjects {
             ]
         }
 
-        override func migrateToNextVersion() throws -> [String : Any] {
+        override func migrateToNextVersion() throws -> [String: Any] {
             var plist = self.plist
 
             var finalAnimals = [[String: Any]]()
@@ -150,17 +150,17 @@ enum PersistenceTestObjects {
                 "people": [
                     ["id": "Person_4932FB60-6D49-4E15-AFD0-599D32CC5F94", "name": "Bob"],
                     ["id": "Person_5932FB60-6D49-4E15-AFD0-599D32CC5F94", "name": "Alice"],
-                    ["id": "Person_6932FB60-6D49-4E15-AFD0-599D32CC5F94", "name": "Pilky"]
+                    ["id": "Person_6932FB60-6D49-4E15-AFD0-599D32CC5F94", "name": "Pilky"],
                 ],
                 "animals": [
                     ["id": "Animal_4932FB60-6D49-4E15-AFD0-599D32CC5F94", "species": "Birb"],
                     ["id": "Animal_5932FB60-6D49-4E15-AFD0-599D32CC5F94", "species": "Bear"],
-                    ["id": "Animal_6932FB60-6D49-4E15-AFD0-599D32CC5F94", "species": "Possum", "image": ["type": "png", "filename": "photo.png", "metadata": ["colour": true]]]
+                    ["id": "Animal_6932FB60-6D49-4E15-AFD0-599D32CC5F94", "species": "Possum", "image": ["type": "png", "filename": "photo.png", "metadata": ["colour": true]]],
                 ],
                 "robots": [
                     ["id": "Robot_4932FB60-6D49-4E15-AFD0-599D32CC5F94", "name": "PilkyBot"],
                     ["id": "Robot_5932FB60-6D49-4E15-AFD0-599D32CC5F94", "name": "SinisterBot"],
-                ]
+                ],
             ]
         }
     }
@@ -184,12 +184,12 @@ enum PersistenceTestObjects {
                 "animals": [
                     ["id": "Animal_4932FB60-6D49-4E15-AFD0-599D32CC5F94", "species": "Birb", "lastMeal": "Bob"],
                     ["id": "Animal_5932FB60-6D49-4E15-AFD0-599D32CC5F94", "species": "Bear", "lastMeal": "Alice"],
-                    ["id": "Animal_6932FB60-6D49-4E15-AFD0-599D32CC5F94", "species": "Possum", "lastMeal": "Pilky", "image": ["type": "png", "filename": "photo.png", "metadata": ["colour": true]]]
+                    ["id": "Animal_6932FB60-6D49-4E15-AFD0-599D32CC5F94", "species": "Possum", "lastMeal": "Pilky", "image": ["type": "png", "filename": "photo.png", "metadata": ["colour": true]]],
                 ],
                 "robots": [
                     ["id": "Robot_4932FB60-6D49-4E15-AFD0-599D32CC5F94", "name": "PilkyBot"],
                     ["id": "Robot_5932FB60-6D49-4E15-AFD0-599D32CC5F94", "name": "SinisterBot"],
-                ]
+                ],
             ]
         }
     }

@@ -10,7 +10,6 @@ import XCTest
 @testable import M3Data
 
 final class ModelPlistTests: XCTestCase {
-
     var testPlist: [String: Any]!
 
     override func setUp() async throws {
@@ -21,21 +20,21 @@ final class ModelPlistTests: XCTestCase {
                 [
                     "id": "Page_26F8CA72-4EAA-4120-BBAD-2688B47E6C6C",
                     "title": "My Awesome Page",
-                    "content": "To be written…"
+                    "content": "To be written…",
                 ],
                 [
                     "id": "Page_96F8CA72-4EAA-4120-BBAD-2688B47E6C6C",
                     "title": "All About Possums",
-                    "content": "They are awesome"
-                ]
+                    "content": "They are awesome",
+                ],
             ],
             "canvases": [
                 [
                     "id": "Canvas_AAAACA72-4EAA-4120-BBAD-2688B47E6C6C",
                     "name": "First Canvas",
-                    "meaningOfLife": 42
-                ]
-            ]
+                    "meaningOfLife": 42,
+                ],
+            ],
         ]
     }
 
@@ -122,11 +121,11 @@ final class ModelPlistTests: XCTestCase {
         let modelPlist = TestModelPlist()
         try modelPlist.setPlistRepresentations([
             [.id: ModelID(modelType: Self.pageModelType, uuidString: "26F8CA72-4EAA-4120-BBAD-2688B47E6C6C")!, ModelPlistKey(rawValue: "title"): "Page 1"],
-            [.id: ModelID(modelType: Self.pageModelType, uuidString: "96F8CA72-4EAA-4120-BBAD-2688B47E6C6C")!, ModelPlistKey(rawValue: "title"): "Page 2"]
+            [.id: ModelID(modelType: Self.pageModelType, uuidString: "96F8CA72-4EAA-4120-BBAD-2688B47E6C6C")!, ModelPlistKey(rawValue: "title"): "Page 2"],
         ], for: Self.pageModelType)
 
         try modelPlist.setPlistRepresentations([
-            [.id: ModelID(modelType: Self.canvasModelType, uuidString: "AAAACA72-4EAA-4120-BBAD-2688B47E6C6C")!, ModelPlistKey(rawValue: "title"): "My Canvas"]
+            [.id: ModelID(modelType: Self.canvasModelType, uuidString: "AAAACA72-4EAA-4120-BBAD-2688B47E6C6C")!, ModelPlistKey(rawValue: "title"): "My Canvas"],
         ], for: Self.canvasModelType)
 
 
@@ -147,11 +146,11 @@ final class ModelPlistTests: XCTestCase {
         let modelPlist = TestModelPlist()
         try modelPlist.setPlistRepresentations([
             [.id: ModelID(modelType: Self.pageModelType, uuidString: "96F8CA72-4EAA-4120-BBAD-2688B47E6C6C")!, ModelPlistKey(rawValue: "title"): "Page 2"],
-            [.id: ModelID(modelType: Self.pageModelType, uuidString: "26F8CA72-4EAA-4120-BBAD-2688B47E6C6C")!, ModelPlistKey(rawValue: "title"): "Page 1"]
+            [.id: ModelID(modelType: Self.pageModelType, uuidString: "26F8CA72-4EAA-4120-BBAD-2688B47E6C6C")!, ModelPlistKey(rawValue: "title"): "Page 1"],
         ], for: Self.pageModelType)
 
         try modelPlist.setPlistRepresentations([
-            [.id: ModelID(modelType: Self.canvasModelType, uuidString: "AAAACA72-4EAA-4120-BBAD-2688B47E6C6C")!, ModelPlistKey(rawValue: "title"): "My Canvas"]
+            [.id: ModelID(modelType: Self.canvasModelType, uuidString: "AAAACA72-4EAA-4120-BBAD-2688B47E6C6C")!, ModelPlistKey(rawValue: "title"): "My Canvas"],
         ], for: Self.canvasModelType)
 
 
@@ -167,7 +166,7 @@ final class ModelPlistTests: XCTestCase {
         let modelPlist = TestModelPlist()
         try modelPlist.setPlistRepresentations([
             [.id: ModelID(modelType: Self.pageModelType, uuidString: "26F8CA72-4EAA-4120-BBAD-2688B47E6C6C")!, ModelPlistKey(rawValue: "title"): "Page 1"],
-            [.id: ModelID(modelType: Self.pageModelType, uuidString: "96F8CA72-4EAA-4120-BBAD-2688B47E6C6C")!, ModelPlistKey(rawValue: "title"): "Page 2"]
+            [.id: ModelID(modelType: Self.pageModelType, uuidString: "96F8CA72-4EAA-4120-BBAD-2688B47E6C6C")!, ModelPlistKey(rawValue: "title"): "Page 2"],
         ], for: Self.pageModelType)
 
         XCTAssertNotNil(modelPlist.plist["canvases"])

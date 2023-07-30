@@ -5,11 +5,10 @@
 //  Created by Martin Pilkington on 25/07/2022.
 //
 
-import XCTest
 import M3Data
+import XCTest
 
 final class ModelReaderTests: XCTestCase {
-
     var modelController: PersistenceTestObjects.PersistenceModelController!
     var modelReader: ModelReader!
     var testFileData: Data!
@@ -46,7 +45,7 @@ final class ModelReaderTests: XCTestCase {
         let contentWrapper = FileWrapper(directoryWithFileWrappers: ["photo.png": FileWrapper(regularFileWithContents: self.testFileData)])
         XCTAssertNoThrow(try self.modelReader.read(plistWrapper: plistWrapper, contentWrapper: contentWrapper, shouldMigrate: { true }))
 
-        try validateModelController()
+        try self.validateModelController()
     }
 
     func test_modelReader_migratePlistToNextVersionBeforeLoading() throws {
@@ -55,7 +54,7 @@ final class ModelReaderTests: XCTestCase {
         let contentWrapper = FileWrapper(directoryWithFileWrappers: ["photo.png": FileWrapper(regularFileWithContents: self.testFileData)])
         XCTAssertNoThrow(try self.modelReader.read(plistWrapper: plistWrapper, contentWrapper: contentWrapper, shouldMigrate: { true }))
 
-        try validateModelController()
+        try self.validateModelController()
     }
 
     func test_modelReader_migratesPlistThroughMultipleVersionsBeforeLoading() throws {
@@ -64,7 +63,7 @@ final class ModelReaderTests: XCTestCase {
         let contentWrapper = FileWrapper(directoryWithFileWrappers: ["photo.png": FileWrapper(regularFileWithContents: self.testFileData)])
         XCTAssertNoThrow(try self.modelReader.read(plistWrapper: plistWrapper, contentWrapper: contentWrapper, shouldMigrate: { true }))
 
-        try validateModelController()
+        try self.validateModelController()
     }
 
     //MARK: - Helper
@@ -93,6 +92,6 @@ final class ModelReaderTests: XCTestCase {
         let robot2 = try XCTUnwrap(robotsCollection.objectWithID(ModelID(modelType: PersistenceTestObjects.Robot.modelType, uuidString: "5932FB60-6D49-4E15-AFD0-599D32CC5F94")!))
         XCTAssertEqual(robot2.plistRepresentation[ModelPlistKey(rawValue: "name")] as? String, "SinisterBot")
 
-        XCTAssertEqual(self.modelController.settings.integer(for: ModelSettings.Setting.init(rawValue: "zoo-efficiency")), 90)
+        XCTAssertEqual(self.modelController.settings.integer(for: ModelSettings.Setting(rawValue: "zoo-efficiency")), 90)
     }
 }

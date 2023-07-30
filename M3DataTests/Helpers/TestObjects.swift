@@ -6,8 +6,8 @@
 //  Copyright © 2019 M Cubed Software. All rights reserved.
 //
 
-import M3Data
 import Foundation
+import M3Data
 
 class TestModelObject: ModelObject {
     var plistRepresentation = [ModelPlistKey: Any]()

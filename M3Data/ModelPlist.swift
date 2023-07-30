@@ -26,7 +26,7 @@ open class ModelPlist {
         preconditionFailure("Implement in subclass")
     }
 
-    public required convenience init(plist: [String: Any]) throws {
+    required public convenience init(plist: [String: Any]) throws {
         let version = (plist["version"] as? Int) ?? 1
         guard version == Self.version else {
             throw Errors.invalidVersion(received: version, expected: Self.version)
@@ -46,7 +46,7 @@ open class ModelPlist {
         }
     }
 
-    public required init() {
+    required public init() {
         var dictionary: [ModelType: [[ModelPlistKey: Any]]] = [:]
         for supportedType in Self.supportedTypes {
             dictionary[supportedType.modelType] = []

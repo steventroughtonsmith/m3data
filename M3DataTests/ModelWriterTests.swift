@@ -5,8 +5,8 @@
 //  Created by Martin Pilkington on 25/07/2022.
 //
 
-import XCTest
 @testable import M3Data
+import XCTest
 
 final class ModelWriterTests: XCTestCase {
     var modelController: PersistenceTestObjects.PersistenceModelController!
@@ -58,7 +58,7 @@ final class ModelWriterTests: XCTestCase {
         self.modelController.collection(for: PersistenceTestObjects.Animal.self).newObject() {
             $0.plistRepresentation = [
                 ModelPlistKey(rawValue: "id"): $0.id,
-                ModelPlistKey(rawValue: "image"): ModelFile(type: "png", filename: "test.png", data: self.testFileData, metadata: [:])
+                ModelPlistKey(rawValue: "image"): ModelFile(type: "png", filename: "test.png", data: self.testFileData, metadata: [:]),
             ]
         }
         let (_, _, _, files) = try self.generateWrappers()
@@ -72,7 +72,7 @@ final class ModelWriterTests: XCTestCase {
         self.modelController.collection(for: PersistenceTestObjects.Animal.self).newObject() {
             $0.plistRepresentation = [
                 ModelPlistKey(rawValue: "id"): $0.id,
-                ModelPlistKey(rawValue: "modelIDProperty"): ModelID(modelType: PersistenceTestObjects.Person.modelType, uuid: expectedUUID)
+                ModelPlistKey(rawValue: "modelIDProperty"): ModelID(modelType: PersistenceTestObjects.Person.modelType, uuid: expectedUUID),
             ]
         }
 
@@ -86,7 +86,7 @@ final class ModelWriterTests: XCTestCase {
         self.modelController.collection(for: PersistenceTestObjects.Animal.self).newObject() {
             $0.plistRepresentation = [
                 ModelPlistKey(rawValue: "id"): $0.id,
-                ModelPlistKey(rawValue: "modelFileProperty"): ModelFile(type: "png", filename: "foobar.baz", data: Data(), metadata: ["hello": "world"])
+                ModelPlistKey(rawValue: "modelFileProperty"): ModelFile(type: "png", filename: "foobar.baz", data: Data(), metadata: ["hello": "world"]),
             ]
         }
 
@@ -107,8 +107,8 @@ final class ModelWriterTests: XCTestCase {
                 ModelPlistKey(rawValue: "id"): $0.id,
                 ModelPlistKey(rawValue: "modelIDProperty"): [
                     ModelID(modelType: PersistenceTestObjects.Person.modelType, uuid: expectedUUID1),
-                    ModelID(modelType: PersistenceTestObjects.Robot.modelType, uuid: expectedUUID2)
-                ]
+                    ModelID(modelType: PersistenceTestObjects.Robot.modelType, uuid: expectedUUID2),
+                ],
             ]
         }
 
@@ -127,7 +127,7 @@ final class ModelWriterTests: XCTestCase {
                 ModelPlistKey(rawValue: "modelFileProperty"): [
                     ModelFile(type: "png", filename: "foobar.baz", data: Data(), metadata: ["hello": "world"]),
                     ModelFile(type: "jpeg", filename: "possum.jpeg", data: Data(), metadata: ["goodbye": "void"]),
-                ]
+                ],
             ]
         }
 
@@ -152,13 +152,13 @@ final class ModelWriterTests: XCTestCase {
                 ModelPlistKey(rawValue: "dictionaryProperty"): [
                     ModelPlistKey(rawValue: "modelID"): ModelID(modelType: PersistenceTestObjects.Person.modelType, uuid: expectedUUID),
                     ModelPlistKey(rawValue: "modelFile"): ModelFile(type: "png", filename: "foobar.baz", data: Data(), metadata: ["hello": "world"]),
-                ]
+                ],
             ]
         }
 
         PersistenceTestObjects.Animal.propertyConversionsOverride = [ModelPlistKey(rawValue: "dictionaryProperty"): .dictionary([
             ModelPlistKey(rawValue: "modelID"): .modelID,
-            ModelPlistKey(rawValue: "modelFile"): .modelFile
+            ModelPlistKey(rawValue: "modelFile"): .modelFile,
         ])]
 
         let (animals, _, _, _) = try self.generateWrappers()
@@ -179,13 +179,13 @@ final class ModelWriterTests: XCTestCase {
                     ModelPlistKey(rawValue: "modelID"): ModelID(modelType: PersistenceTestObjects.Person.modelType, uuid: expectedUUID),
                     ModelPlistKey(rawValue: "doNotConvert"): 42,
                     ModelPlistKey(rawValue: "modelFile"): ModelFile(type: "png", filename: "foobar.baz", data: Data(), metadata: ["hello": "world"]),
-                ]
+                ],
             ]
         }
 
         PersistenceTestObjects.Animal.propertyConversionsOverride = [ModelPlistKey(rawValue: "dictionaryProperty"): .dictionary([
             ModelPlistKey(rawValue: "modelID"): .modelID,
-            ModelPlistKey(rawValue: "modelFile"): .modelFile
+            ModelPlistKey(rawValue: "modelFile"): .modelFile,
         ])]
 
         let (animals, _, _, _) = try self.generateWrappers()
