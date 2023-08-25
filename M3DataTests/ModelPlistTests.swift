@@ -15,7 +15,7 @@ final class ModelPlistTests: XCTestCase {
     override func setUp() async throws {
         self.testPlist = [
             "version": 4,
-            "settings": ["name": "Bob", "isPro": true],
+            "settings": ["name": "Bob", "isPro": true] as [String: Any],
             "pages": [
                 [
                     "id": "Page_26F8CA72-4EAA-4120-BBAD-2688B47E6C6C",
@@ -33,7 +33,7 @@ final class ModelPlistTests: XCTestCase {
                     "id": "Canvas_AAAACA72-4EAA-4120-BBAD-2688B47E6C6C",
                     "name": "First Canvas",
                     "meaningOfLife": 42,
-                ],
+                ] as [String: Any],
             ],
         ]
     }
@@ -67,7 +67,7 @@ final class ModelPlistTests: XCTestCase {
             ["id": 1234, "colour": "red"],
             ["id": 5678, "colour": "blue"],
             ["id": 90, "colour": "green"],
-        ]
+        ] as [[String: Any]]
 
         let modelPlist = try TestModelPlist(plist: self.testPlist)
         XCTAssertEqual(modelPlist.plistRepresentations(of: ModelType(rawValue: "bugs")!).count, 0)

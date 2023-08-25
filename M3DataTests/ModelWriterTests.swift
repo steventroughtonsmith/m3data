@@ -152,7 +152,7 @@ final class ModelWriterTests: XCTestCase {
                 ModelPlistKey(rawValue: "dictionaryProperty"): [
                     ModelPlistKey(rawValue: "modelID"): ModelID(modelType: PersistenceTestObjects.Person.modelType, uuid: expectedUUID),
                     ModelPlistKey(rawValue: "modelFile"): ModelFile(type: "png", filename: "foobar.baz", data: Data(), metadata: ["hello": "world"]),
-                ],
+                ] as [ModelPlistKey: Any],
             ]
         }
 
@@ -179,7 +179,7 @@ final class ModelWriterTests: XCTestCase {
                     ModelPlistKey(rawValue: "modelID"): ModelID(modelType: PersistenceTestObjects.Person.modelType, uuid: expectedUUID),
                     ModelPlistKey(rawValue: "doNotConvert"): 42,
                     ModelPlistKey(rawValue: "modelFile"): ModelFile(type: "png", filename: "foobar.baz", data: Data(), metadata: ["hello": "world"]),
-                ],
+                ] as [ModelPlistKey: Any],
             ]
         }
 

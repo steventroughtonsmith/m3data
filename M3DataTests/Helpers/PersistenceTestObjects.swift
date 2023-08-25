@@ -83,9 +83,9 @@ enum PersistenceTestObjects {
         override func migrateToNextVersion() throws -> [String: Any] {
             var plist = self.plist
             plist["animals"] = [
-                ["id": "Animal_4932FB60-6D49-4E15-AFD0-599D32CC5F94", "species": "Birb"],
+                ["id": "Animal_4932FB60-6D49-4E15-AFD0-599D32CC5F94", "species": "Birb"] as [String: Any],
                 ["id": "Animal_5932FB60-6D49-4E15-AFD0-599D32CC5F94", "species": "Bear"],
-                ["id": "Animal_6932FB60-6D49-4E15-AFD0-599D32CC5F94", "species": "Possum", "image": ["type": "png", "filename": "photo.png", "metadata": ["colour": true]]],
+                ["id": "Animal_6932FB60-6D49-4E15-AFD0-599D32CC5F94", "species": "Possum", "image": ["type": "png", "filename": "photo.png", "metadata": ["colour": true]] as [String: Any]],
             ]
             plist["settings"] = ["zoo-efficiency": 90]
             plist["version"] = 2
@@ -153,9 +153,9 @@ enum PersistenceTestObjects {
                     ["id": "Person_6932FB60-6D49-4E15-AFD0-599D32CC5F94", "name": "Pilky"],
                 ],
                 "animals": [
-                    ["id": "Animal_4932FB60-6D49-4E15-AFD0-599D32CC5F94", "species": "Birb"],
+                    ["id": "Animal_4932FB60-6D49-4E15-AFD0-599D32CC5F94", "species": "Birb"] as [String: Any],
                     ["id": "Animal_5932FB60-6D49-4E15-AFD0-599D32CC5F94", "species": "Bear"],
-                    ["id": "Animal_6932FB60-6D49-4E15-AFD0-599D32CC5F94", "species": "Possum", "image": ["type": "png", "filename": "photo.png", "metadata": ["colour": true]]],
+                    ["id": "Animal_6932FB60-6D49-4E15-AFD0-599D32CC5F94", "species": "Possum", "image": ["type": "png", "filename": "photo.png", "metadata": ["colour": true]] as [String: Any]],
                 ],
                 "robots": [
                     ["id": "Robot_4932FB60-6D49-4E15-AFD0-599D32CC5F94", "name": "PilkyBot"],
@@ -183,8 +183,8 @@ enum PersistenceTestObjects {
                 "settings": ["zoo-efficiency": 90],
                 "animals": [
                     ["id": "Animal_4932FB60-6D49-4E15-AFD0-599D32CC5F94", "species": "Birb", "lastMeal": "Bob"],
-                    ["id": "Animal_5932FB60-6D49-4E15-AFD0-599D32CC5F94", "species": "Bear", "lastMeal": "Alice"],
-                    ["id": "Animal_6932FB60-6D49-4E15-AFD0-599D32CC5F94", "species": "Possum", "lastMeal": "Pilky", "image": ["type": "png", "filename": "photo.png", "metadata": ["colour": true]]],
+                    ["id": "Animal_5932FB60-6D49-4E15-AFD0-599D32CC5F94", "species": "Bear", "lastMeal": "Alice"] as [String: Any],
+                    ["id": "Animal_6932FB60-6D49-4E15-AFD0-599D32CC5F94", "species": "Possum", "lastMeal": "Pilky", "image": ["type": "png", "filename": "photo.png", "metadata": ["colour": true]] as [String: Any]],
                 ],
                 "robots": [
                     ["id": "Robot_4932FB60-6D49-4E15-AFD0-599D32CC5F94", "name": "PilkyBot"],
