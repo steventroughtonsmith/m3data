@@ -6,6 +6,7 @@
 //  Copyright © 2019 M Cubed Software. All rights reserved.
 //
 
+import Combine
 import Foundation
 
 public enum ModelObjectUpdateErrors: Error, Equatable {
@@ -119,6 +120,10 @@ public protocol CollectableModelObject: ModelObject, Hashable {
 extension CollectableModelObject {
     public var modelController: ModelController? {
         return self.collection?.modelController
+    }
+
+    public var changePublisher: AnyPublisher<ModelCollection<Self>.Change, Never>? {
+        return self.collection?.changePublisher.filter { $0.object.id == self.id }.eraseToAnyPublisher()
     }
 
     @discardableResult public static func create(in modelController: ModelController, setupBlock: ((Self) -> Void)? = nil) -> Self {

@@ -54,15 +54,11 @@ extension ModelController {
     }
 
     public func pushChangeGroup() {
-        self.allCollections.values
-            .compactMap { $0 as? ModelChangeGroupHandler }
-            .forEach { $0.pushChangeGroup() }
+        self.allCollections.values.forEach { $0.pushChangeGroup() }
     }
 
     public func popChangeGroup() {
-        self.allCollections.values
-            .compactMap { $0 as? ModelChangeGroupHandler }
-            .forEach { $0.popChangeGroup() }
+        self.allCollections.values.forEach { $0.popChangeGroup() }
     }
 
     public func disableUndo(_ caller: () throws -> Void) rethrows {

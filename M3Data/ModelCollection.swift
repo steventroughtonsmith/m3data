@@ -6,6 +6,7 @@
 //  Copyright © 2019 M Cubed Software. All rights reserved.
 //
 
+import Combine
 import Foundation
 
 public enum ModelChangeType: Equatable {
@@ -16,18 +17,6 @@ public enum ModelChangeType: Equatable {
 
 
 public class ModelCollection<ModelType: CollectableModelObject> {
-    public struct Observation {
-        fileprivate let id = UUID()
-        fileprivate let filterIDs: [ModelID]?
-        fileprivate let changeHandler: (Change) -> Void
-
-        fileprivate func notifyOfChange(_ change: Change) {
-            if ((self.filterIDs == nil) || (self.filterIDs?.contains(change.object.id) == true)) {
-                self.changeHandler(change)
-            }
-        }
-    }
-
     public class Change {
         public let object: ModelType
         public init(object: ModelType) {
@@ -72,12 +61,6 @@ public class ModelCollection<ModelType: CollectableModelObject> {
 
         func registerChange(to object: ModelType, changeType: ModelChangeType, keyPath: PartialKeyPath<ModelType>? = nil) {
             self.change(for: object).registerChange(ofType: changeType, keyPath: keyPath)
-        }
-
-        func notify(_ observers: [Observation]) {
-            for (_, change) in self.changes {
-                observers.forEach { $0.notifyOfChange(change) }
-            }
         }
     }
 
@@ -166,20 +149,8 @@ public class ModelCollection<ModelType: CollectableModelObject> {
     }
 
 
-    //MARK: - Observation
-    private var observers = [Observation]()
-
-    public func addObserver(filterBy uuids: [ModelID]? = nil, changeHandler: @escaping (Change) -> Void) -> Observation {
-        let observer = Observation(filterIDs: uuids, changeHandler: changeHandler)
-        self.observers.append(observer)
-        return observer
-    }
-
-    public func removeObserver(_ observer: Observation) {
-        if let index = self.observers.firstIndex(where: { $0.id == observer.id }) {
-            self.observers.remove(at: index)
-        }
-    }
+    //MARK: - Change Observation
+    public let changePublisher = PassthroughSubject<Change, Never>()
 
     private var changeRegistrationEnabled = true
 
@@ -189,9 +160,9 @@ public class ModelCollection<ModelType: CollectableModelObject> {
         }
 
         guard let currentChangeGroup = self.changeGroups.last else {
-            let changeGroup = ChangeGroup()
-            changeGroup.registerChange(to: object, changeType: changeType, keyPath: keyPath)
-            changeGroup.notify(self.observers)
+            let change = Change(object: object)
+            change.registerChange(ofType: changeType, keyPath: keyPath)
+            self.changePublisher.send(change)
             return
         }
         currentChangeGroup.registerChange(to: object, changeType: changeType, keyPath: keyPath)
@@ -230,8 +201,13 @@ extension ModelCollection: ModelChangeGroupHandler {
     }
 
     public func popChangeGroup() {
-        let changeGroup = self.changeGroups.popLast()
-        changeGroup?.notify(self.observers)
+        guard let changeGroup = self.changeGroups.popLast() else {
+            return
+        }
+        
+        for (_, change) in changeGroup.changes {
+            self.changePublisher.send(change)
+        }
     }
 }
 
@@ -272,6 +248,16 @@ public class AnyModelCollection {
     @discardableResult public func newObject(setupBlock: (ModelSetupBlock)? = nil) -> any CollectableModelObject {
         return self.newObjectImp!(setupBlock)
     }
+
+    fileprivate var pushChangeGroupImp: () -> Void = {}
+    public func pushChangeGroup() {
+        self.pushChangeGroupImp()
+    }
+
+    fileprivate var popChangeGroupImp: () -> Void = {}
+    public func popChangeGroup() {
+        self.popChangeGroupImp()
+    }
 }
 
 extension ModelCollection {
@@ -308,6 +294,14 @@ extension ModelCollection {
             return self.newObject(setupBlock: setupBlock)
         }
 
+        anyCollection.pushChangeGroupImp = {
+            return self.pushChangeGroup()
+        }
+
+        anyCollection.popChangeGroupImp = {
+            return self.popChangeGroup()
+        }
+
         return anyCollection
     }
 }
@@ -320,5 +314,30 @@ public struct ModelCollectionCapabilities: OptionSet {
 
     public init(rawValue: UInt) {
         self.rawValue = rawValue
+    }
+}
+
+extension ModelCollection {
+    @available(*, deprecated, message: "Use changePublisher instead")
+    public struct Observation {
+        fileprivate let id = UUID()
+        fileprivate let filterIDs: [ModelID]?
+        fileprivate let changeHandler: (Change) -> Void
+
+        fileprivate func notifyOfChange(_ change: Change) {
+            if ((self.filterIDs == nil) || (self.filterIDs?.contains(change.object.id) == true)) {
+                self.changeHandler(change)
+            }
+        }
+    }
+
+    @available(*, deprecated, message: "Use changePublisher instead")
+    public func addObserver(filterBy uuids: [ModelID]? = nil, changeHandler: @escaping (Change) -> Void) -> Observation {
+        let observer = Observation(filterIDs: uuids, changeHandler: changeHandler)
+        return observer
+    }
+
+    @available(*, deprecated, message: "Use changePublisher instead")
+    public func removeObserver(_ observer: Observation) {
     }
 }

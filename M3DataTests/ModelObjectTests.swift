@@ -6,6 +6,7 @@
 //  Copyright © 2019 M Cubed Software. All rights reserved.
 //
 
+import Combine
 import M3Data
 import XCTest
 
@@ -52,6 +53,31 @@ class ModelObjectTests: XCTestCase {
         model.collection = self.modelCollection
 
         XCTAssertEqual((model.modelController as! TestModelController), self.modelController)
+    }
+
+
+    //MARK: - CollectableModelObject.changePublisher
+    func test_changePublisher_returnsPublisherFromChangePublisher() throws {
+        let model = TestCollectableModelObject()
+        model.collection = self.modelCollection
+
+        XCTAssertNotNil(model.changePublisher)
+    }
+
+    func test_changePublisher_onlyIncludesObjectInFilter() throws {
+        let model = TestCollectableModelObject()
+        model.collection = self.modelCollection
+
+        let observer1Expectation = self.expectation(description: "Observer 1 Notified")
+        let publisher = try XCTUnwrap(model.changePublisher)
+        let subscriber = publisher.sink { _ in
+            observer1Expectation.fulfill()
+        }
+
+        self.modelCollection.notifyOfChange(to: model, changeType: .insert)
+        self.modelCollection.notifyOfChange(to: TestCollectableModelObject(), changeType: .insert)
+        self.wait(for: [observer1Expectation], timeout: 1)
+        subscriber.cancel()
     }
 
 
