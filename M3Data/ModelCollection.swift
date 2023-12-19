@@ -316,28 +316,3 @@ public struct ModelCollectionCapabilities: OptionSet {
         self.rawValue = rawValue
     }
 }
-
-extension ModelCollection {
-    @available(*, deprecated, message: "Use changePublisher instead")
-    public struct Observation {
-        fileprivate let id = UUID()
-        fileprivate let filterIDs: [ModelID]?
-        fileprivate let changeHandler: (Change) -> Void
-
-        fileprivate func notifyOfChange(_ change: Change) {
-            if ((self.filterIDs == nil) || (self.filterIDs?.contains(change.object.id) == true)) {
-                self.changeHandler(change)
-            }
-        }
-    }
-
-    @available(*, deprecated, message: "Use changePublisher instead")
-    public func addObserver(filterBy uuids: [ModelID]? = nil, changeHandler: @escaping (Change) -> Void) -> Observation {
-        let observer = Observation(filterIDs: uuids, changeHandler: changeHandler)
-        return observer
-    }
-
-    @available(*, deprecated, message: "Use changePublisher instead")
-    public func removeObserver(_ observer: Observation) {
-    }
-}
