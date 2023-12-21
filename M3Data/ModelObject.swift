@@ -126,6 +126,13 @@ extension CollectableModelObject {
         return self.collection?.changePublisher.filter { $0.object.id == self.id }.eraseToAnyPublisher()
     }
 
+    public func changePublisher<T>(for keyPath: KeyPath<Self, T>) -> AnyPublisher<T, Never>? {
+        return self.collection?.changePublisher
+            .filter { $0.object.id == self.id && $0.didUpdate(keyPath) }
+            .map { $0.object[keyPath: keyPath] }
+            .eraseToAnyPublisher()
+    }
+
     @discardableResult public static func create(in modelController: ModelController, setupBlock: ((Self) -> Void)? = nil) -> Self {
         return modelController.collection(for: Self.self).newObject(setupBlock: setupBlock)
     }
