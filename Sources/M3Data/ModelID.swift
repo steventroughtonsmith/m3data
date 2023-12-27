@@ -43,7 +43,29 @@ public struct ModelID: Equatable, Hashable {
 
 
 //MARK: - PlistConversion
-extension ModelID {
+extension ModelID: PlistConvertable {
+	func toPlistValue() throws -> PlistValue {
+		"\(self.modelType.rawValue)_\(self.uuid.uuidString)"
+	}
+	
+	static func fromPlistValue(_ plistValue: PlistValue) throws -> ModelID {
+		guard let value = plistValue as? String else {
+			throw PlistConvertableError.invalidConversionFromPlistValue
+		}
+
+		let components = value.split(separator: "_")
+		guard
+			components.count == 2,
+			let modelType = ModelType(rawValue: String(components[0])),
+			let modelID = ModelID(modelType: modelType, uuidString: String(components[1]))
+		else {
+			throw PlistConvertableError.invalidConversionFromPlistValue
+		}
+		return modelID
+	}
+	
+	
+
     public var stringRepresentation: String {
         return "\(self.modelType.rawValue)_\(self.uuid.uuidString)"
     }

@@ -124,7 +124,7 @@ public class ModelCollection<ModelType: CollectableModelObject> {
 
 
     //MARK: - Relationships
-    public func objectsForRelationship<R: ModelObject>(on object: R, inverseKeyPath: ReferenceWritableKeyPath<ModelType, R?>) -> Set<ModelType> {
+    public func objectsForRelationship<R: ModelObject>(on object: R, inverseKeyPath: KeyPath<ModelType, R?>) -> Set<ModelType> {
         return self.all.filter { $0[keyPath: inverseKeyPath]?.id == object.id }
     }
 

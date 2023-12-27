@@ -110,7 +110,7 @@ public protocol CollectableModelObject: ModelObject, Hashable {
 
     /// Return the objects for a to-many relationship
     /// - Parameter keyPath: The keypath on the returned type that holds the inverse relationship
-    func relationship<T: CollectableModelObject>(for keyPath: ReferenceWritableKeyPath<T, Self?>) -> Set<T>
+    func relationship<T: CollectableModelObject>(for keyPath: KeyPath<T, Self?>) -> Set<T>
 
     func performUpdate(_ updateBlock: (Self) -> Void)
 }
@@ -172,7 +172,7 @@ extension CollectableModelObject {
         relationshipCollection.notifyOfChange(to: relationshipObject, changeType: .update, keyPath: inverseKeyPath)
     }
 
-    public func relationship<T: CollectableModelObject>(for keyPath: ReferenceWritableKeyPath<T, Self?>) -> Set<T> {
+    public func relationship<T: CollectableModelObject>(for keyPath: KeyPath<T, Self?>) -> Set<T> {
         guard let modelController = self.modelController else {
             return Set<T>()
         }
@@ -215,4 +215,33 @@ public struct ModelFile {
         }
         return plist
     }
+}
+
+extension ModelFile: PlistConvertable {
+	func toPlistValue() throws -> PlistValue {
+		var plist: [String: Any] = ["type": self.type]
+		if let filename = self.filename {
+			plist["filename"] = filename
+		}
+		if let metadata = self.metadata {
+			plist["metadata"] = metadata
+		}
+		return plist
+	}
+
+	static func fromPlistValue(_ plistValue: PlistValue) throws -> ModelFile {
+		guard
+			let modelFileDict = plistValue as? [String: Any],
+			let type = modelFileDict["type"] as? String
+		else {
+			throw PlistConvertableError.invalidConversionFromPlistValue
+		}
+
+		return ModelFile(type: type,
+						 filename: modelFileDict["filename"] as? String,
+						 data: modelFileDict["data"] as? Data,
+						 metadata: modelFileDict["metadata"] as? [String: Any])
+	}
+
+
 }

@@ -1,0 +1,31 @@
+{
+  "configurations" : [
+    {
+      "id" : "A01A4B2D-0E07-49D9-AF5D-52AF45590CE4",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : false
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "M3DataTests",
+        "name" : "M3DataTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "M3DataMacrosTests",
+        "name" : "M3DataMacrosTests"
+      }
+    }
+  ],
+  "version" : 1
+}
