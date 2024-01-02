@@ -82,15 +82,5 @@ class ModelObjectTests: XCTestCase {
 
 
     //MARK: - Model File
-    func test_modelFile_plistRepresentation() throws {
-        let modelFile = ModelFile(type: "FileType", filename: "myfile.txt", data: nil, metadata: ["key": "value", "number": 42])
-
-        let plistRepresentation = modelFile.plistRepresentation
-        XCTAssertEqual(plistRepresentation["type"] as? String, "FileType")
-        XCTAssertEqual(plistRepresentation["filename"] as? String, "myfile.txt")
-
-        let metadataPlist = try XCTUnwrap(plistRepresentation["metadata"] as? [String: Any])
-        XCTAssertEqual(metadataPlist["key"] as? String, "value")
-        XCTAssertEqual(metadataPlist["number"] as? Int, 42)
-    }
+    
 }

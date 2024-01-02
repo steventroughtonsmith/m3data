@@ -9,6 +9,5 @@ struct M3DataMacrosPlugin: CompilerPlugin {
         ModelMacro.self,
 		AttributeMacro.self,
 		RelationshipMacro.self,
-		Relationship2Macro.self,
     ]
 }

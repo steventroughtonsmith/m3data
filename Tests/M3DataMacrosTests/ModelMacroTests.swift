@@ -21,6 +21,20 @@ final class M3DataMacroTests: XCTestCase {
 			@Model public class MyModel {
 				public init() {}
 				public init(test: String) {}
+
+				@Attribute var title: String = ""
+				@Attribute(persistenceName: "modelFrame") var frame: CGRect = .zero
+				@Attribute(optional: true, default: 20) var age: Int = 31
+				@Attribute(requiresTransform: true) var someValue: String = ""
+				@Attribute(isModelFile: true) var content: PageContent?
+
+				@Attribute public var dateCreated = Date()
+				@Attribute public var dateModified = true
+				@Attribute public var sortIndex = false
+
+				@Attribute(optional: true) public var viewPort: CGRect?
+
+				@Relationship(inverse: \\String.count, persistenceName: "someModel") var model: MyModel?
 			}
 			""",
 			expandedSource: """

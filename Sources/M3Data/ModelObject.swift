@@ -43,20 +43,21 @@ public protocol ModelObject: AnyObject {
 
     init()
 
-    var otherProperties: [ModelPlistKey: Any] { get }
+    var otherProperties: [ModelPlistKey: PlistValue] { get }
 
     static func modelID(with: UUID) -> ModelID
     static func modelID(withUUIDString: String) -> ModelID?
 
     //MARK: - Plist
-    var plistRepresentation: [ModelPlistKey: Any] { get }
+    var plistRepresentation: ModelObjectPlistRepresentation { get throws }
 
     /// Update the model using the supplied Plist values.
     ///
     /// Implementations should check the plist to see if IDs match before updating
     /// - Parameter plist: The plist to update
-    func update(fromPlistRepresentation plist: [ModelPlistKey: Any]) throws
+    func update(fromPlistRepresentation plist: ModelObjectPlistRepresentation) throws
 
+	static var modelFileProperties: [ModelPlistKey] { get }
     static var propertyConversions: [ModelPlistKey: ModelPropertyConversion] { get }
 }
 
@@ -73,6 +74,14 @@ extension ModelObject {
     public var undoManager: UndoManager? {
         return self.modelController?.undoManager
     }
+
+	public static var modelFileProperties: [ModelPlistKey] {
+		return []
+	}
+
+	var modelFileProperties: [ModelPlistKey] {
+		return Self.modelFileProperties
+	}
 
     public static var propertyConversions: [ModelPlistKey: ModelPropertyConversion] {
         return [:]
@@ -189,59 +198,4 @@ extension CollectableModelObject {
     public func delete() {
         self.collection?.delete(self)
     }
-}
-
-
-public struct ModelFile {
-    public let type: String
-    public let filename: String?
-    public let data: Data?
-    public let metadata: [String: Any]?
-
-    public init(type: String, filename: String?, data: Data?, metadata: [String: Any]?) {
-        self.type = type
-        self.filename = filename
-        self.data = data
-        self.metadata = metadata
-    }
-
-    public var plistRepresentation: [String: Any] {
-        var plist: [String: Any] = ["type": self.type]
-        if let filename = self.filename {
-            plist["filename"] = filename
-        }
-        if let metadata = self.metadata {
-            plist["metadata"] = metadata
-        }
-        return plist
-    }
-}
-
-extension ModelFile: PlistConvertable {
-	func toPlistValue() throws -> PlistValue {
-		var plist: [String: Any] = ["type": self.type]
-		if let filename = self.filename {
-			plist["filename"] = filename
-		}
-		if let metadata = self.metadata {
-			plist["metadata"] = metadata
-		}
-		return plist
-	}
-
-	static func fromPlistValue(_ plistValue: PlistValue) throws -> ModelFile {
-		guard
-			let modelFileDict = plistValue as? [String: Any],
-			let type = modelFileDict["type"] as? String
-		else {
-			throw PlistConvertableError.invalidConversionFromPlistValue
-		}
-
-		return ModelFile(type: type,
-						 filename: modelFileDict["filename"] as? String,
-						 data: modelFileDict["data"] as? Data,
-						 metadata: modelFileDict["metadata"] as? [String: Any])
-	}
-
-
 }

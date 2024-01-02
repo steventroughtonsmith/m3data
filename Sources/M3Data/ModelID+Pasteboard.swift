@@ -27,12 +27,11 @@ extension ModelID {
 		guard pasteboardItem.types.contains(ModelID.PasteboardType),
 			  let propertyList = pasteboardItem.propertyList(forType: ModelID.PasteboardType) as? [String: String],
 			  let uuidString = propertyList[ModelID.UUIDKey],
-			  let modelTypeString = propertyList[ModelID.modelTypeKey],
-			  let modelType = ModelType(rawValue: modelTypeString)
+			  let modelTypeString = propertyList[ModelID.modelTypeKey]
 		else {
 			return nil
 		}
-		self.init(modelType: modelType, uuidString: uuidString)
+		self.init(modelType: ModelType(rawValue: modelTypeString), uuidString: uuidString)
 	}
 }
 

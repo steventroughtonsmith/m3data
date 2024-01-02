@@ -7,12 +7,22 @@
 
 import Foundation
 
-extension Array where Element: PlistConvertable {
-	func toPlistValue() throws -> PlistValue {
-		return try self.map { try $0.toPlistValue() }
+extension Array where Element == PlistConvertable {
+	public func toPlistValue() throws -> PlistValue {
+		throw PlistConvertableError.attemptedToConvertNonHomogeneousCollection
 	}
 
-	static func fromPlistValue(_ plistValue: PlistValue) throws -> [Element] {
+	static public func fromPlistValue(_ plistValue: PlistValue) throws -> Array<PlistConvertable> {
+		throw PlistConvertableError.attemptedToConvertNonHomogeneousCollection
+	}
+}
+
+extension Array: PlistConvertable where Element: PlistConvertable {
+	public func toPlistValue() throws -> PlistValue {
+		return try self.map { try $0.toPlistValue() } as PlistValue
+	}
+
+	public static func fromPlistValue(_ plistValue: PlistValue) throws -> [Element] {
 		let array = plistValue as? [PlistValue]
 		guard let array else {
 			throw PlistConvertableError.invalidConversionFromPlistValue
@@ -21,13 +31,23 @@ extension Array where Element: PlistConvertable {
 	}
 }
 
-extension Dictionary where Key == String, Value: PlistConvertable {
-	func toPlistValue() throws -> PlistValue {
-		return try self.mapValues { try $0.toPlistValue() }
+extension Dictionary where Value == PlistConvertable {
+	public func toPlistValue() throws -> PlistValue {
+		throw PlistConvertableError.attemptedToConvertNonHomogeneousCollection
 	}
 
-	static func fromPlistValue(_ plistValue: PlistValue) throws -> [String: Value] {
-		guard let dictionary = plistValue as? [String: PlistValue] else {
+	static public func fromPlistValue(_ plistValue: PlistValue) throws -> Array<PlistConvertable> {
+		throw PlistConvertableError.attemptedToConvertNonHomogeneousCollection
+	}
+}
+
+extension Dictionary: PlistConvertable where Value: PlistConvertable {
+	public func toPlistValue() throws -> PlistValue {
+		return try self.mapValues { try $0.toPlistValue() } as PlistValue
+	}
+
+	public static func fromPlistValue(_ plistValue: PlistValue) throws -> [Key: Value] {
+		guard let dictionary = plistValue as? [Key: PlistValue] else {
 			throw PlistConvertableError.invalidConversionFromPlistValue
 		}
 
@@ -36,7 +56,7 @@ extension Dictionary where Key == String, Value: PlistConvertable {
 }
 
 extension URL: PlistConvertable {
-	static func fromPlistValue(_ plistValue: PlistValue) throws -> URL {
+	public static func fromPlistValue(_ plistValue: PlistValue) throws -> URL {
 		guard
 			let value = plistValue as? String,
 			let url = URL(string: value)
@@ -46,7 +66,46 @@ extension URL: PlistConvertable {
 		return url
 	}
 
-	func toPlistValue() throws -> PlistValue {
+	public func toPlistValue() throws -> PlistValue {
 		return self.absoluteString
+	}
+}
+
+extension CGRect: PlistConvertable {
+	public func toPlistValue() throws -> PlistValue {
+		return NSStringFromRect(self)
+	}
+	
+	public static func fromPlistValue(_ plistValue: PlistValue) throws -> CGRect {
+		guard let value = plistValue as? String else {
+			throw PlistConvertableError.invalidConversionFromPlistValue
+		}
+		return NSRectFromString(value)
+	}
+}
+
+extension CGPoint: PlistConvertable {
+	public func toPlistValue() throws -> PlistValue {
+		return NSStringFromPoint(self)
+	}
+	
+	public static func fromPlistValue(_ plistValue: PlistValue) throws -> CGPoint {
+		guard let value = plistValue as? String else {
+			throw PlistConvertableError.invalidConversionFromPlistValue
+		}
+		return NSPointFromString(value)
+	}
+}
+
+extension CGSize: PlistConvertable {
+	public func toPlistValue() throws -> PlistValue {
+		return NSStringFromSize(self)
+	}
+
+	public static func fromPlistValue(_ plistValue: PlistValue) throws -> CGSize {
+		guard let value = plistValue as? String else {
+			throw PlistConvertableError.invalidConversionFromPlistValue
+		}
+		return NSSizeFromString(value)
 	}
 }

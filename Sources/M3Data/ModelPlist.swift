@@ -26,7 +26,7 @@ open class ModelPlist {
         preconditionFailure("Implement in subclass")
     }
 
-    required public convenience init(plist: [String: Any]) throws {
+    required public convenience init(plist: [String: PlistValue]) throws {
         let version = (plist["version"] as? Int) ?? 1
         guard version == Self.version else {
             throw Errors.invalidVersion(received: version, expected: Self.version)
@@ -37,17 +37,20 @@ open class ModelPlist {
         self.settings = (plist["settings"] as? [String: Any]) ?? [:]
 
         for persistenceTypes in Self.supportedTypes {
-            guard let modelPlists = plist[persistenceTypes.persistenceName] as? [[String: Any]] else {
+			guard
+				let modelPlists = plist[persistenceTypes.persistenceName] as? [[String: Any]],
+				let typedModelPlists = modelPlists as? [[String: PlistValue]]
+			else {
                 throw Errors.missingCollection(persistenceTypes.persistenceName)
             }
 
-            let plistRepresentation = try modelPlists.map { try $0.toModelPlistRepresentation }
+            let plistRepresentation = try typedModelPlists.map { try ModelObjectPlistRepresentation(persistenceRepresentation: $0) }
             try self.setPlistRepresentations(plistRepresentation, for: persistenceTypes.modelType)
         }
     }
 
     required public init() {
-        var dictionary: [ModelType: [[ModelPlistKey: Any]]] = [:]
+        var dictionary: [ModelType: [ModelObjectPlistRepresentation]] = [:]
         for supportedType in Self.supportedTypes {
             dictionary[supportedType.modelType] = []
         }
@@ -56,14 +59,14 @@ open class ModelPlist {
 
 
     //MARK: - Plist Generation
-    public var plist: [String: Any] {
-        var plist = [String: Any]()
+    public var plist: [String: PlistValue] {
+        var plist = [String: PlistValue]()
         plist["version"] = Self.version
-        plist["settings"] = self.settings
+        plist["settings"] = self.settings as PlistValue
         for supportedType in Self.supportedTypes {
-            plist[supportedType.persistenceName] = self.plistRepresentations(of: supportedType.modelType).map(\.toPersistanceRepresentation).sorted {
+            plist[supportedType.persistenceName] = self.plistRepresentations(of: supportedType.modelType).map(\.persistenceRepresentation).sorted {
                 return ($0["id"] as? String ?? "") < ($1["id"] as? String ?? "")
-            }
+			} as PlistValue
         }
         return plist
     }
@@ -72,20 +75,21 @@ open class ModelPlist {
     //MARK: - Data Access
     public var settings: [String: Any] = [:]
 
-    private var plistRepresentations: [ModelType: [[ModelPlistKey: Any]]]
-    public func plistRepresentations(of modelType: ModelType) -> [[ModelPlistKey: Any]] {
+    private var plistRepresentations: [ModelType: [ModelObjectPlistRepresentation]]
+    public func plistRepresentations(of modelType: ModelType) -> [ModelObjectPlistRepresentation] {
         return self.plistRepresentations[modelType] ?? []
     }
 
-    func setPlistRepresentations(_ representations: [[ModelPlistKey: Any]], for modelType: ModelType) throws {
+    func setPlistRepresentations(_ representations: [ModelObjectPlistRepresentation], for modelType: ModelType) throws {
         guard Self.supportedTypes.contains(where: { $0.modelType == modelType }) else {
             throw Errors.invalidCollection(modelType.rawValue)
         }
         self.plistRepresentations[modelType] = representations
     }
 
+
     //MARK: - Migration
-    open func migrateToNextVersion() throws -> [String: Any] {
+    open func migrateToNextVersion() throws -> [String: PlistValue] {
         preconditionFailure("Implement in subclass")
     }
 }
@@ -101,39 +105,7 @@ extension ModelPlist {
     }
 }
 
-extension Dictionary where Key == String, Value == Any {
-    var toModelPlistRepresentation: [ModelPlistKey: Any] {
-        get throws {
-            var modelPlistKeys = [ModelPlistKey: Any]()
-            for (key, value) in self {
-                let plistKey = ModelPlistKey(rawValue: key)
-                if (plistKey == .id), let rawModelID = value as? String, let modelID = ModelID(string: rawModelID) {
-                    modelPlistKeys[plistKey] = modelID
-                } else {
-                    modelPlistKeys[plistKey] = value
-                }
-            }
-            guard modelPlistKeys[.id] != nil else {
-                throw ModelPlist.Errors.missingID(self)
-            }
-            return modelPlistKeys
-        }
-    }
-}
-
 extension Dictionary where Key == ModelPlistKey, Value == Any {
-    public var toPersistanceRepresentation: [String: Any] {
-        var stringKeys = [String: Any]()
-        for (key, value) in self {
-            if (key == .id), let modelID = value as? ModelID {
-                stringKeys[key.rawValue] = modelID.stringRepresentation
-            } else {
-                stringKeys[key.rawValue] = value
-            }
-        }
-        return stringKeys
-    }
-
     public func attribute<T>(withKey key: ModelPlistKey) -> T? {
         return self[key] as? T
     }
@@ -145,4 +117,3 @@ extension Dictionary where Key == ModelPlistKey, Value == Any {
         return value
     }
 }
-

@@ -7,14 +7,14 @@
 
 import Foundation
 
-protocol PlistValue: PlistConvertable {}
+public protocol PlistValue: PlistConvertable {}
 
 extension PlistValue {
-	func toPlistValue() throws -> PlistValue {
+	public func toPlistValue() throws -> PlistValue {
 		return self
 	}
 
-	static func fromPlistValue(_ plistValue: PlistValue) throws -> Self {
+	public static func fromPlistValue(_ plistValue: PlistValue) throws -> Self {
 		guard let value = plistValue as? Self else {
 			throw PlistConvertableError.invalidConversionFromPlistValue
 		}
@@ -29,5 +29,13 @@ extension Double: PlistValue {}
 extension Bool: PlistValue {}
 extension Date: PlistValue {}
 extension Data: PlistValue {}
-extension Array: PlistValue {}
-extension Dictionary: PlistValue {}
+extension Array: PlistValue where Element: PlistValue {}
+extension Dictionary: PlistValue where Value: PlistValue {}
+
+//We need NS values too
+extension NSNumber: PlistValue {}
+extension NSDictionary: PlistValue {}
+extension NSArray: PlistValue {}
+extension NSString: PlistValue {}
+extension NSData: PlistValue {}
+extension NSDate: PlistValue {}

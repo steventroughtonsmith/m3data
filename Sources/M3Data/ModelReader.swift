@@ -25,13 +25,14 @@ public class ModelReader {
     public func read(plistWrapper: FileWrapper, contentWrapper: FileWrapper?, shouldMigrate: () -> Bool) throws {
         guard
             let plistData = plistWrapper.regularFileContents,
-            let plistDict = try? PropertyListSerialization.propertyList(from: plistData, format: nil) as? [String: Any]
+			let plistDict = try? PropertyListSerialization.propertyList(from: plistData, format: nil) as? [String: Any],
+			let convertedDict = plistDict as? [String: PlistValue]
         else {
             throw Errors.invalidPlist
         }
 
         //We default to 1 here as the only thing that should not have a version property is a v1 Coppice document
-        let version = (plistDict["version"] as? Int) ?? 1
+		let version: Int = try .fromPlistValue(convertedDict["version", default: 1])
         let plistTypes = self.plistTypes(fromVersion: version)
         guard plistTypes.count > 0 else {
             throw Errors.versionNotSupported
@@ -43,7 +44,7 @@ public class ModelReader {
             }
         }
 
-        let plist = try self.loadPlist(fromDictionary: plistDict, usingTypes: plistTypes)
+        let plist = try self.loadPlist(fromDictionary: convertedDict, usingTypes: plistTypes)
 
         self.modelController.settings.update(withPlist: plist.settings)
 
@@ -60,7 +61,7 @@ public class ModelReader {
         return self.plists.filter { $0.version >= version }
     }
 
-    private func loadPlist(fromDictionary plistDict: [String: Any], usingTypes plistTypes: [ModelPlist.Type]) throws -> ModelPlist {
+    private func loadPlist(fromDictionary plistDict: [String: PlistValue], usingTypes plistTypes: [ModelPlist.Type]) throws -> ModelPlist {
         var nextTypes = plistTypes
         let plistType = nextTypes.removeFirst()
         let plist = try plistType.init(plist: plistDict)
@@ -71,10 +72,10 @@ public class ModelReader {
         return try self.loadPlist(fromDictionary: try plist.migrateToNextVersion(), usingTypes: nextTypes)
     }
 
-    private func createAndDeleteObjects(in collection: AnyModelCollection, using plistRepresentations: [[ModelPlistKey: Any]]) {
+    private func createAndDeleteObjects(in collection: AnyModelCollection, using plistRepresentations: [ModelObjectPlistRepresentation]) {
         try? collection.disableUndo {
             let existingIDs = Set(collection.all.map { $0.id })
-            let newIDs = Set(plistRepresentations.compactMap { $0[.id] as? ModelID })
+			let newIDs = Set(plistRepresentations.compactMap { $0.id })
 
             let itemsToAdd = newIDs.subtracting(existingIDs)
             let itemsToRemove = existingIDs.subtracting(newIDs)
@@ -91,91 +92,22 @@ public class ModelReader {
         }
     }
 
-    private func updateObjects(in collection: AnyModelCollection, using plistRepresentations: [[ModelPlistKey: Any]], content: [String: FileWrapper]?) throws {
+    private func updateObjects(in collection: AnyModelCollection, using plistRepresentations: [ModelObjectPlistRepresentation], content: [String: FileWrapper]?) throws {
         try collection.disableUndo {
             for plistRepresentation in plistRepresentations {
-                guard
-                    let id = plistRepresentation[.id] as? ModelID,
-                    let item = collection.objectWithID(id)
-                else {
+                guard let item = collection.objectWithID(plistRepresentation.id) else {
                     return
                 }
 
-                var convertedPlist = plistRepresentation
-                for (plistKey, conversion) in item.propertyConversions {
-                    guard let value = convertedPlist[plistKey] else {
-                        continue
-                    }
-                    if let convertedValue = self.apply(conversion, to: value, content: content) {
-                        convertedPlist[plistKey] = convertedValue
-                    }
-                }
+				let plist: ModelObjectPlistRepresentation
+				if let content {
+					plist = try plistRepresentation.applyingModelFiles(from: content, to: item.modelFileProperties)
+				} else {
+					plist = plistRepresentation
+				}
 
-                try item.update(fromPlistRepresentation: convertedPlist)
+				try item.update(fromPlistRepresentation: plist)
             }
         }
-    }
-
-    private func apply(_ conversion: ModelPropertyConversion, to value: Any, content: [String: FileWrapper]?) -> Any? {
-        switch conversion {
-        case .modelID:
-            return self.convertToModelID(value)
-        case .array(let conversion):
-            return self.convertToArray(value, conversion: conversion, content: content)
-        case .modelFile:
-            return self.convertToModelFile(value, content: content)
-        case .dictionary(let conversions):
-            return self.convertToDictionary(value, conversions: conversions, content: content)
-        }
-    }
-
-    private func convertToModelFile(_ propertyValue: Any, content: [String: FileWrapper]?) -> ModelFile? {
-        let modelFilePlist = propertyValue as? [String: Any]
-        guard let type = modelFilePlist?["type"] as? String else {
-            return nil
-        }
-
-        let metadata = modelFilePlist?["metadata"] as? [String: Any]
-        let modelFile: ModelFile
-        if let filename = modelFilePlist?["filename"] as? String {
-            let data = content?[filename]?.regularFileContents
-            modelFile = ModelFile(type: type, filename: filename, data: data, metadata: metadata)
-        } else {
-            modelFile = ModelFile(type: type, filename: nil, data: nil, metadata: metadata)
-        }
-
-        return modelFile
-    }
-
-    private func convertToModelID(_ propertyValue: Any) -> ModelID? {
-        guard let modelIDString = propertyValue as? String else {
-            return nil
-        }
-        return ModelID(string: modelIDString)
-    }
-
-    private func convertToArray(_ propertyValue: Any, conversion: ModelPropertyConversion, content: [String: FileWrapper]?) -> [Any]? {
-        guard let array = propertyValue as? [Any] else {
-            return nil
-        }
-
-        return array.map { self.apply(conversion, to: $0, content: content) ?? $0 }
-    }
-
-    private func convertToDictionary(_ propertyValue: Any, conversions: [ModelPlistKey: ModelPropertyConversion], content: [String: FileWrapper]?) -> [ModelPlistKey: Any]? {
-        guard let dictionary = propertyValue as? [String: Any] else {
-            return nil
-        }
-        var returnDictionary = [ModelPlistKey: Any]()
-        for key in dictionary.keys {
-            let plistKey = ModelPlistKey(rawValue: key)
-            let value = dictionary[key]
-            if let conversion = conversions[plistKey], let convertedValue = self.apply(conversion, to: value as Any, content: content) {
-                returnDictionary[plistKey] = convertedValue
-            } else {
-                returnDictionary[plistKey] = value
-            }
-        }
-        return returnDictionary
     }
 }

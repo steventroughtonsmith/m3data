@@ -3,11 +3,11 @@ import AppKit
 import CoreGraphics
 
 //Initial line count: 886
-//Final line count:
+//Final line count: 333
 
 @Model
 final public class Canvas {
-	public enum Theme: String, CaseIterable {
+	public enum Theme: String, CaseIterable, PlistConvertable {
 		case auto
 		case dark
 		case light
@@ -18,6 +18,20 @@ final public class Canvas {
 			case .dark: return NSLocalizedString("Dark", comment: "Dark theme name")
 			case .light: return NSLocalizedString("Light", comment: "Light theme name")
 			}
+		}
+
+		public func toPlistValue() throws -> PlistValue {
+			return self.rawValue
+		}
+
+		public static func fromPlistValue(_ plistValue: PlistValue) throws -> Theme {
+			guard
+				let value = plistValue as? String,
+				let theme = Theme(rawValue: value)
+			else {
+				throw PlistConvertableError.invalidConversionFromPlistValue
+			}
+			return theme
 		}
 	}
 
@@ -36,7 +50,7 @@ final public class Canvas {
 
 	@Attribute public var viewPort: CGRect?
 
-	@Attribute public var zoomFactor: CGFloat = 1 {
+	@Attribute(optional: true, default: 1) public var zoomFactor: Double = 1 {
 		didSet {
 			if self.zoomFactor > 1 {
 				self.zoomFactor = 1
@@ -46,10 +60,10 @@ final public class Canvas {
 		}
 	}
 
-	@Attribute public var thumbnail: NSImage?
+	@Attribute(optional: true, isModelFile: true) public var thumbnail: Thumbnail?
 
 	///Added 2021.2
-	@Attribute public var alwaysShowPageTitles: Bool = false
+	@Attribute(optional: true, default: false) public var alwaysShowPageTitles: Bool = false
 
 
 	//MARK: - Relationships
@@ -64,103 +78,28 @@ final public class Canvas {
 	public var pageHierarchies: Set<PageHierarchy> {
 		return self.relationship(for: \.canvas)
 	}
-
-
-	//MARK: - Plists
-	public static var propertyConversions: [ModelPlistKey: ModelPropertyConversion] {
-		return [.Canvas.thumbnail: .modelFile]
-	}
-
-	public var plistRepresentation: [ModelPlistKey: Any] {
-		var plist = self.otherProperties
-
-		plist[.id] = self.id
-		plist[.Canvas.title] = self.title
-		plist[.Canvas.dateCreated] = self.dateCreated
-		plist[.Canvas.dateModified] = self.dateModified
-		plist[.Canvas.sortIndex] = self.sortIndex
-		plist[.Canvas.theme] = self.theme.rawValue
-		plist[.Canvas.zoomFactor] = self.zoomFactor
-		plist[.Canvas.alwaysShowPageTitles] = self.alwaysShowPageTitles
-
-		if let thumbnailData = self.thumbnail?.pngData() {
-			plist[.Canvas.thumbnail] = ModelFile(type: "thumbnail", filename: "\(self.id.uuid.uuidString)-thumbnail.png", data: thumbnailData, metadata: [:])
-		}
-		if let viewPort = self.viewPort  {
-			plist[.Canvas.viewPort] = NSStringFromRect(viewPort)
-		}
-
-		return plist
-	}
-
-	public func update(fromPlistRepresentation plist: [ModelPlistKey: Any]) throws {
-		guard self.id == plist.attribute(withKey: .id) else {
-			throw ModelObjectUpdateErrors.idsDontMatch
-		}
-
-		let title: String = try plist.requiredAttribute(withKey: .Canvas.title)
-		let dateCreated: Date = try plist.requiredAttribute(withKey: .Canvas.dateCreated)
-		let dateModified: Date = try plist.requiredAttribute(withKey: .Canvas.dateModified)
-		let sortIndex: Int = try plist.requiredAttribute(withKey: .Canvas.sortIndex)
-
-		let rawTheme: String = try plist.requiredAttribute(withKey: .Canvas.theme)
-		guard let theme = Theme(rawValue: rawTheme) else {
-			throw ModelObjectUpdateErrors.attributeNotFound(ModelPlistKey.Canvas.theme.rawValue)
-		}
-
-		self.title = title
-		self.dateCreated = dateCreated
-		self.dateModified = dateModified
-		self.sortIndex = sortIndex
-		self.theme = theme
-
-		if let viewPortString: String = plist.attribute(withKey: .Canvas.viewPort) {
-			self.viewPort = NSRectFromString(viewPortString)
-		} else {
-			self.viewPort = nil
-		}
-
-		if let thumbnail: ModelFile = plist.attribute(withKey: .Canvas.thumbnail) {
-			if let data = thumbnail.data {
-				self.thumbnail = NSImage(data: data)
-			}
-		} else {
-			self.thumbnail = nil
-		}
-
-		if let zoomFactor: CGFloat = plist.attribute(withKey: .Canvas.zoomFactor) {
-			self.zoomFactor = zoomFactor
-		} else {
-			self.zoomFactor = 1
-		}
-
-		if let alwaysShowPageTitles: Bool = plist.attribute(withKey: .Canvas.alwaysShowPageTitles) {
-			self.alwaysShowPageTitles = alwaysShowPageTitles
-		}
-
-		let plistKeys = ModelPlistKey.Canvas.all
-		self.otherProperties = plist.filter { (key, _) -> Bool in
-			return plistKeys.contains(key) == false
-		}
-	}
 }
 
+extension Canvas {
+	public struct Thumbnail: PlistConvertable {
+		public let data: Data
+		public let canvasID: ModelID
 
-extension ModelPlistKey {
-	enum Canvas {
-		static let title = ModelPlistKey(rawValue: "title")
-		static let dateCreated = ModelPlistKey(rawValue: "dateCreated")
-		static let dateModified = ModelPlistKey(rawValue: "dateModified")
-		static let sortIndex = ModelPlistKey(rawValue: "sortIndex")
-		static let theme = ModelPlistKey(rawValue: "theme")
-		static let zoomFactor = ModelPlistKey(rawValue: "zoomFactor")
-		static let thumbnail = ModelPlistKey(rawValue: "thumbnail")
-		static let viewPort = ModelPlistKey(rawValue: "viewPort")
-		static let alwaysShowPageTitles = ModelPlistKey(rawValue: "alwaysShowPageTitles") ///Added 2021.2
-		static let closedPageHierarchies = ModelPlistKey(rawValue: "closedPageHierarchies") ///Removed in 2022.2
+		public func toPlistValue() throws -> PlistValue {
+			return ModelFile(type: "thumbnail", filename: "\(canvasID.uuid.uuidString)-thumbnail.png", data: data, metadata: [:])
+		}
 
-		static var all: [ModelPlistKey] {
-			return [.id, .Canvas.title, .Canvas.dateCreated, .Canvas.dateModified, .Canvas.sortIndex, .Canvas.theme, .Canvas.zoomFactor, .Canvas.thumbnail, .Canvas.viewPort, .Canvas.alwaysShowPageTitles]
+		public static func fromPlistValue(_ plistValue: PlistValue) throws -> Self {
+			guard
+				let modelFile: ModelFile = try .fromPlistValue(plistValue),
+				let thumbnailComponents = modelFile.filename?.components(separatedBy: "-thumbnail"),
+				thumbnailComponents.count == 2,
+				let uuid = UUID(uuidString: thumbnailComponents[0]),
+				let data = modelFile.data
+			else {
+				throw PlistConvertableError.invalidConversionFromPlistValue
+			}
+			return self.init(data: data, canvasID: Canvas.modelID(with: uuid))
 		}
 	}
 }
@@ -176,7 +115,7 @@ final public class Page {
 	//MARK: - Init
 	public init() {
 		self._title = ""
-		self._content = TestPageContent()
+		self._content = PageContent()
 		self.content.page = self
 	}
 
@@ -197,7 +136,7 @@ final public class Page {
 	}
 
 	/// Added in 2021.2
-	@Attribute public var allowsAutoLinking: Bool = true
+	@Attribute(optional: true, default: true) public var allowsAutoLinking: Bool = true
 
 
 	//MARK: - Relationships
@@ -206,81 +145,10 @@ final public class Page {
 	}
 
 	// MARK: - Content
-	@Attribute public var content: PageContent {
+	@Attribute(isModelFile: true) public var content: PageContent {
 		didSet {
 			self.content.page = self
 			NotificationCenter.default.post(name: Page.contentChangedNotification, object: self)
-		}
-	}
-
-	//MARK: - Plists
-	public static var propertyConversions: [ModelPlistKey: ModelPropertyConversion] {
-		return [.Page.content: .modelFile]
-	}
-
-	public var plistRepresentation: [ModelPlistKey: Any] {
-		var plist = self.otherProperties
-		plist[.id] = self.id.stringRepresentation
-		plist[.Page.title] = self.title
-		plist[.Page.dateCreated] = self.dateCreated
-		plist[.Page.dateModified] = self.dateModified
-		plist[.Page.content] = self.content.modelFile
-		if let preferredSize = self.userPreferredSize {
-			plist[.Page.userPreferredSize] = NSStringFromSize(preferredSize)
-		}
-		plist[.Page.allowsAutoLinking] = self.allowsAutoLinking
-
-		return plist
-	}
-
-	public func update(fromPlistRepresentation plist: [ModelPlistKey: Any]) throws {
-		guard self.id == plist.attribute(withKey: .id) else {
-			throw ModelObjectUpdateErrors.idsDontMatch
-		}
-
-		//Get values
-		let title: String = try plist.requiredAttribute(withKey: .Page.title)
-		let dateCreated: Date = try plist.requiredAttribute(withKey: .Page.dateCreated)
-		let dateModified: Date = try plist.requiredAttribute(withKey: .Page.dateModified)
-
-		var userPreferredSize: CGSize? = nil
-		if let userPreferredSizeString: String = plist.attribute(withKey: .Page.userPreferredSize) {
-			userPreferredSize = NSSizeFromString(userPreferredSizeString)
-		}
-
-		let contentModelFile: ModelFile = try plist.requiredAttribute(withKey: .Page.content)
-		guard let contentType = PageContentType(rawValue: contentModelFile.type) else {
-			throw ModelObjectUpdateErrors.attributeNotFound(ModelPlistKey.Page.content.rawValue)
-		}
-
-		let allowsAutoLinking = plist.attribute(withKey: .Page.allowsAutoLinking) ?? true
-
-		//Set values
-		self.title = title
-		self.dateCreated = dateCreated
-		self.dateModified = dateModified
-		self.userPreferredSize = userPreferredSize
-		self.content = try contentType.createContent(modelFile: contentModelFile)
-		self.allowsAutoLinking = allowsAutoLinking
-
-		let plistKeys = ModelPlistKey.Page.all
-		self.otherProperties = plist.filter { (key, _) -> Bool in
-			return plistKeys.contains(key) == false
-		}
-	}
-}
-
-extension ModelPlistKey {
-	enum Page {
-		static let title = ModelPlistKey(rawValue: "title")
-		static let dateCreated = ModelPlistKey(rawValue: "dateCreated")
-		static let dateModified = ModelPlistKey(rawValue: "dateModified")
-		static let content = ModelPlistKey(rawValue: "content")
-		static let userPreferredSize = ModelPlistKey(rawValue: "userPreferredSize")
-		static let allowsAutoLinking = ModelPlistKey(rawValue: "allowsAutoLinking") //Added 2021.2
-
-		static var all: [ModelPlistKey] {
-			return [.id, .Page.title, .Page.dateCreated, .Page.dateModified, .Page.content, .Page.userPreferredSize, .Page.allowsAutoLinking]
 		}
 	}
 }
@@ -311,97 +179,6 @@ final public class CanvasPage {
 	public var linksIn: Set<CanvasLink> {
 		return self.relationship(for: \.destinationPage)
 	}
-
-	//MARK: - Old Relationships
-	@ModelObjectReference public var parent: CanvasPage? {
-		didSet {
-//			self.willChangeValue(for: \.title)
-			self.didChangeRelationship(\.parent, inverseKeyPath: \.children, oldValue: oldValue)
-//			self.didChangeValue(for: \.title)
-		}
-	}
-
-	public var children: Set<CanvasPage> {
-		self.relationship(for: \.parent)
-	}
-
-	//MARK: - Relationship Setup
-	public func objectWasInserted() {
-		self.$parent.modelController = self.modelController
-	}
-
-	public func objectWasDeleted() {
-		self.$parent.performCleanUp()
-	}
-
-
-	//MARK: - Plists
-	public static var propertyConversions: [ModelPlistKey: ModelPropertyConversion] {
-		return [
-			.CanvasPage.page: .modelID,
-			.CanvasPage.canvas: .modelID,
-		]
-	}
-
-	public var plistRepresentation: [ModelPlistKey: Any] {
-		var plist = self.otherProperties
-
-		plist[.id] = self.id
-		plist[.CanvasPage.frame] = NSStringFromRect(self.frame)
-		plist[.CanvasPage.zIndex] = self.zIndex
-
-		if let page = self.page {
-			plist[.CanvasPage.page] = page.id
-		}
-		if let canvas = self.canvas {
-			plist[.CanvasPage.canvas] = canvas.id
-		}
-		return plist
-	}
-
-	public func update(fromPlistRepresentation plist: [ModelPlistKey: Any]) throws {
-		guard let modelController = self.modelController else {
-			throw ModelObjectUpdateErrors.modelControllerNotSet
-		}
-
-		guard self.id == plist.attribute(withKey: .id) else {
-			throw ModelObjectUpdateErrors.idsDontMatch
-		}
-
-		let frameString: String = try plist.requiredAttribute(withKey: .CanvasPage.frame)
-		self.frame = NSRectFromString(frameString)
-
-		if let pageID: ModelID = plist.attribute(withKey: .CanvasPage.page) {
-			self.page = modelController.collection(for: Page.self).objectWithID(pageID)
-		}
-
-		if let canvasID: ModelID = plist.attribute(withKey: .CanvasPage.canvas) {
-			self.canvas = modelController.collection(for: Canvas.self).objectWithID(canvasID)
-		}
-
-		if let zIndex: Int = plist.attribute(withKey: .CanvasPage.zIndex) {
-			self.zIndex = zIndex
-		}
-
-		let plistKeys = ModelPlistKey.CanvasPage.all
-		self.otherProperties = plist.filter { (key, _) -> Bool in
-			return plistKeys.contains(key) == false
-		}
-	}
-}
-
-extension ModelPlistKey {
-	enum CanvasPage {
-		static let frame = ModelPlistKey(rawValue: "frame")
-		static let zIndex = ModelPlistKey(rawValue: "zIndex")
-		static let page = ModelPlistKey(rawValue: "page")
-		static let canvas = ModelPlistKey(rawValue: "canvas")
-		static let parent = ModelPlistKey(rawValue: "parent")
-
-		static var all: [ModelPlistKey] {
-			return [.id, .CanvasPage.frame, .CanvasPage.zIndex, .CanvasPage.page, .CanvasPage.canvas, .CanvasPage.parent]
-		}
-	}
 }
 
 
@@ -414,79 +191,6 @@ final public class CanvasLink {
 	@Relationship(inverse: \CanvasPage.linksIn) public var destinationPage: CanvasPage?
 	@Relationship(inverse: \CanvasPage.linksOut) public var sourcePage: CanvasPage?
 	@Relationship(inverse: \Canvas.links) public var canvas: Canvas?
-
-	//MARK: - Plist
-	public static var propertyConversions: [ModelPlistKey: ModelPropertyConversion] {
-		return [
-			.CanvasLink.sourcePage: .modelID,
-			.CanvasLink.destinationPage: .modelID,
-			.CanvasLink.canvas: .modelID,
-		]
-	}
-
-	public var plistRepresentation: [ModelPlistKey: Any] {
-		var plist = self.otherProperties
-		plist[.id] = self.id
-
-		if let link = self.link {
-			plist[.CanvasLink.link] = link.url.absoluteString
-		}
-
-		if let destinationPage = self.destinationPage {
-			plist[.CanvasLink.destinationPage] = destinationPage.id
-		}
-
-		if let sourcePage = self.sourcePage {
-			plist[.CanvasLink.sourcePage] = sourcePage.id
-		}
-
-		if let canvas = self.canvas {
-			plist[.CanvasLink.canvas] = canvas.id
-		}
-
-		return plist
-	}
-
-	public func update(fromPlistRepresentation plist: [ModelPlistKey: Any]) throws {
-		guard self.id == plist.attribute(withKey: .id) else {
-			throw ModelObjectUpdateErrors.idsDontMatch
-		}
-
-		if let linkString: String = plist.attribute(withKey: .CanvasLink.link), let linkURL = URL(string: linkString), let link = PageLink(url: linkURL) {
-			self.link = link
-		}
-
-		if let destinationID: ModelID = plist.attribute(withKey: .CanvasLink.destinationPage) {
-//			self.$destinationPage.modelID = destinationID
-		}
-
-		if let sourceID: ModelID = plist.attribute(withKey: .CanvasLink.sourcePage) {
-//			self.$sourcePage.modelID = sourceID
-		}
-
-		if let canvasID: ModelID = plist.attribute(withKey: .CanvasLink.canvas) {
-//			self.$canvas.modelID = canvasID
-		}
-
-		let plistKeys = ModelPlistKey.CanvasLink.all
-		self.otherProperties = plist.filter { (key, _) -> Bool in
-			return plistKeys.contains(key) == false
-		}
-	}
-}
-
-
-extension ModelPlistKey {
-	enum CanvasLink {
-		static let link = ModelPlistKey(rawValue: "link")
-		static let destinationPage = ModelPlistKey(rawValue: "destinationPage")
-		static let sourcePage = ModelPlistKey(rawValue: "sourcePage")
-		static let canvas = ModelPlistKey(rawValue: "canvas")
-
-		static var all: [ModelPlistKey] {
-			return [.id, .CanvasLink.link, .CanvasLink.destinationPage, .CanvasLink.sourcePage, .CanvasLink.canvas]
-		}
-	}
 }
 
 
@@ -498,98 +202,12 @@ final public class PageHierarchy {
 	@Attribute public var pages: [PageRef] = []
 	@Attribute public var links: [LinkRef] = []
 
-	public static var propertyConversions: [ModelPlistKey: ModelPropertyConversion] {
-		return [
-			.PageHierarchy.rootPageID: .modelID,
-			.PageHierarchy.pages: .array(.dictionary([
-				.PageHierarchy.PageRef.canvasPageID: .modelID,
-				.PageHierarchy.PageRef.pageID: .modelID,
-			])),
-			.PageHierarchy.links: .array(.dictionary([
-				.PageHierarchy.LinkRef.sourceID: .modelID,
-				.PageHierarchy.LinkRef.destinationID: .modelID,
-			])),
-			.PageHierarchy.entryPoints: .array(.dictionary([:])),
-			.PageHierarchy.canvas: .modelID,
-		]
-	}
-
 	//MARK: - Relationships
 	@Relationship(inverse: \Canvas.pageHierarchies) public var canvas: Canvas?
-
-
-	//MARK: - Plist
-	public var plistRepresentation: [ModelPlistKey: Any] {
-		var plist = self.otherProperties
-		plist[.id] = self.id
-		plist[.PageHierarchy.rootPageID] = self.rootPageID
-		plist[.PageHierarchy.entryPoints] = self.entryPoints.map(\.plistRepresentation)
-		plist[.PageHierarchy.pages] = self.pages.map(\.plistRepresentation)
-		plist[.PageHierarchy.links] = self.links.map(\.plistRepresentation)
-		plist[.PageHierarchy.canvas] = self.canvas?.id.stringRepresentation
-		return plist
-	}
-
-	public func update(fromPlistRepresentation plist: [ModelPlistKey: Any]) throws {
-		guard let modelController = self.modelController else {
-			throw ModelObjectUpdateErrors.modelControllerNotSet
-		}
-
-		guard self.id == plist.attribute(withKey: .id) else {
-			throw ModelObjectUpdateErrors.idsDontMatch
-		}
-
-		let rootPageID: ModelID? = plist.attribute(withKey: .PageHierarchy.rootPageID)
-		let rawEntryPoints: [[ModelPlistKey: Any]] = try plist.requiredAttribute(withKey: .PageHierarchy.entryPoints)
-		let rawPages: [[ModelPlistKey: Any]] = try plist.requiredAttribute(withKey: .PageHierarchy.pages)
-		let rawLinks: [[ModelPlistKey: Any]] = try plist.requiredAttribute(withKey: .PageHierarchy.links)
-
-		var entryPoints: [EntryPoint] = []
-		for rawEntryPoint in rawEntryPoints {
-			guard let entryPoint = EntryPoint(plist: rawEntryPoint) else {
-				throw ModelObjectUpdateErrors.attributeNotFound("entryPoints")
-			}
-			entryPoints.append(entryPoint)
-		}
-
-		var pages: [PageRef] = []
-		for rawPage in rawPages {
-			guard let pageRef = PageRef(plist: rawPage) else {
-				throw ModelObjectUpdateErrors.attributeNotFound("pages")
-			}
-			pages.append(pageRef)
-		}
-
-		var links: [LinkRef] = []
-		for rawLink in rawLinks {
-			guard let link = LinkRef(plist: rawLink) else {
-				throw ModelObjectUpdateErrors.attributeNotFound("links")
-			}
-			links.append(link)
-		}
-
-		self.rootPageID = rootPageID
-		self.entryPoints = entryPoints
-		self.pages = pages
-		self.links = links
-
-		if let canvasID: ModelID = plist.attribute(withKey: .PageHierarchy.canvas) {
-			self.canvas = modelController.collection(for: Canvas.self).objectWithID(canvasID)
-		}
-	}
-
-	//MARK: - Relationship Setup
-	public func objectWasInserted() {
-		self.$canvas.modelController = self.modelController
-	}
-
-	public func objectWasDeleted() {
-		self.$canvas.performCleanUp()
-	}
 }
 
 extension PageHierarchy {
-	public struct EntryPoint {
+	public struct EntryPoint: PlistConvertable {
 		var pageLink: PageLink
 		var relativePosition: CGPoint
 
@@ -598,29 +216,27 @@ extension PageHierarchy {
 			self.relativePosition = relativePosition
 		}
 
-		init?(plist: [ModelPlistKey: Any]) {
-			guard
-				let pageLinkString: String = try? plist.requiredAttribute(withKey: .PageHierarchy.EntryPoint.pageLink),
-				let url = URL(string: pageLinkString),
-				let pageLink = PageLink(url: url),
-				let relativePositionString: String = try? plist.requiredAttribute(withKey: .PageHierarchy.EntryPoint.relativePosition)
-			else {
-				return nil
-			}
-
-			self.pageLink = pageLink
-			self.relativePosition = NSPointFromString(relativePositionString)
+		public func toPlistValue() throws -> PlistValue {
+			return [
+				"pageLink": try self.pageLink.toPlistValue(),
+				"relativePosition": try self.relativePosition.toPlistValue()
+			] as PlistValue
 		}
 
-		var plistRepresentation: [ModelPlistKey: Any] {
-			return [
-				.PageHierarchy.EntryPoint.pageLink: self.pageLink.url.absoluteString,
-				.PageHierarchy.EntryPoint.relativePosition: NSStringFromPoint(self.relativePosition),
-			]
+		public static func fromPlistValue(_ plistValue: PlistValue) throws -> PageHierarchy.EntryPoint {
+			guard 
+				let value = plistValue as? [String: PlistValue],
+				let pageLink = value["pageLink"],
+				let relativePosition = value["relativePosition"]
+			else {
+				throw PlistConvertableError.invalidConversionFromPlistValue
+			}
+			return EntryPoint(pageLink: try .fromPlistValue(pageLink),
+							  relativePosition: try .fromPlistValue(relativePosition))
 		}
 	}
 
-	public struct PageRef {
+	public struct PageRef: PlistConvertable {
 		var canvasPageID: ModelID
 		var pageID: ModelID
 		/// Position relative to the hierarchy
@@ -632,31 +248,30 @@ extension PageHierarchy {
 			self.relativeContentFrame = relativeContentFrame
 		}
 
-
-		init?(plist: [ModelPlistKey: Any]) {
-			guard
-				let canvasPageID: ModelID = try? plist.requiredAttribute(withKey: .PageHierarchy.PageRef.canvasPageID),
-				let pageID: ModelID = try? plist.requiredAttribute(withKey: .PageHierarchy.PageRef.pageID),
-				let relativeFrameString: String = try? plist.requiredAttribute(withKey: .PageHierarchy.PageRef.relativeContentFrame)
-			else {
-				return nil
-			}
-
-			self.canvasPageID = canvasPageID
-			self.pageID = pageID
-			self.relativeContentFrame = NSRectFromString(relativeFrameString)
+		public func toPlistValue() throws -> PlistValue {
+			return [
+				"canvasPageID": try self.canvasPageID.toPlistValue(),
+				"pageID": try self.pageID.toPlistValue(),
+				"relativeContentFrame": try self.relativeContentFrame.toPlistValue()
+			] as PlistValue
 		}
 
-		var plistRepresentation: [ModelPlistKey: Any] {
-			return [
-				.PageHierarchy.PageRef.canvasPageID: self.canvasPageID,
-				.PageHierarchy.PageRef.pageID: self.pageID,
-				.PageHierarchy.PageRef.relativeContentFrame: NSStringFromRect(self.relativeContentFrame),
-			]
+		public static func fromPlistValue(_ plistValue: PlistValue) throws -> PageRef {
+			guard
+				let value = plistValue as? [String: PlistValue],
+				let canvasPageID = value["canvasPageID"],
+				let pageID = value["pageID"],
+				let relativeContentFrame = value["relativeContentFrame"]
+			else {
+				throw PlistConvertableError.invalidConversionFromPlistValue
+			}
+			return PageRef(canvasPageID: try .fromPlistValue(canvasPageID),
+						   pageID: try .fromPlistValue(pageID),
+						   relativeContentFrame: try .fromPlistValue(relativeContentFrame))
 		}
 	}
 
-	public struct LinkRef {
+	public struct LinkRef: PlistConvertable {
 		var sourceID: ModelID
 		var destinationID: ModelID
 		var link: PageLink
@@ -667,55 +282,26 @@ extension PageHierarchy {
 			self.link = link
 		}
 
-		init?(plist: [ModelPlistKey: Any]) {
-			guard
-				let sourceID: ModelID = try? plist.requiredAttribute(withKey: .PageHierarchy.LinkRef.sourceID),
-				let destinationID: ModelID = try? plist.requiredAttribute(withKey: .PageHierarchy.LinkRef.destinationID),
-				let linkString: String = try? plist.requiredAttribute(withKey: .PageHierarchy.LinkRef.link),
-				let url = URL(string: linkString),
-				let pageLink = PageLink(url: url)
-			else {
-				return nil
-			}
-
-			self.sourceID = sourceID
-			self.destinationID = destinationID
-			self.link = pageLink
-		}
-
-		var plistRepresentation: [ModelPlistKey: Any] {
+		public func toPlistValue() throws -> PlistValue {
 			return [
-				.PageHierarchy.LinkRef.sourceID: self.sourceID,
-				.PageHierarchy.LinkRef.destinationID: self.destinationID,
-				.PageHierarchy.LinkRef.link: self.link.url.absoluteString,
-			]
-		}
-	}
-}
-
-extension ModelPlistKey {
-	enum PageHierarchy {
-		static let rootPageID = ModelPlistKey(rawValue: "rootPageID")
-		static let entryPoints = ModelPlistKey(rawValue: "entryPoints")
-		static let pages = ModelPlistKey(rawValue: "pages")
-		static let links = ModelPlistKey(rawValue: "links")
-		static let canvas = ModelPlistKey(rawValue: "canvas")
-
-		enum EntryPoint {
-			static let pageLink = ModelPlistKey(rawValue: "pageLink")
-			static let relativePosition = ModelPlistKey(rawValue: "relativePosition")
+				"sourceID": try self.sourceID.toPlistValue(),
+				"destinationID": try self.destinationID.toPlistValue(),
+				"link": try self.link.toPlistValue()
+			] as PlistValue
 		}
 
-		enum PageRef {
-			static let canvasPageID = ModelPlistKey(rawValue: "canvasPageID")
-			static let pageID = ModelPlistKey(rawValue: "pageID")
-			static let relativeContentFrame = ModelPlistKey(rawValue: "relativeContentFrame")
-		}
-
-		enum LinkRef {
-			static let sourceID = ModelPlistKey(rawValue: "sourceID")
-			static let destinationID = ModelPlistKey(rawValue: "destinationID")
-			static let link = ModelPlistKey(rawValue: "link")
+		public static func fromPlistValue(_ plistValue: PlistValue) throws -> LinkRef {
+			guard
+				let value = plistValue as? [String: PlistValue],
+				let sourceID = value["sourceID"],
+				let destinationID = value["destinationID"],
+				let link = value["link"]
+			else {
+				throw PlistConvertableError.invalidConversionFromPlistValue
+			}
+			return LinkRef(sourceID: try .fromPlistValue(sourceID),
+						   destinationID: try .fromPlistValue(destinationID),
+						   link: try .fromPlistValue(link))
 		}
 	}
 }
@@ -746,63 +332,7 @@ final public class Folder: FolderContainable {
 	public var sortType: String {
 		return "0Folder"
 	}
-
-
-	//MARK: - Plist
-	public static var propertyConversions: [ModelPlistKey: ModelPropertyConversion] {
-		return [.Folder.contents: .array(.modelID)]
-	}
-
-	public var plistRepresentation: [ModelPlistKey: Any] {
-		var plist = self.otherProperties
-
-		plist[.id] = self.id
-		plist[.Folder.title] = self.title
-		plist[.Folder.contents] = self.contents.map(\.id)
-		plist[.Folder.dateCreated] = self.dateCreated
-
-		return plist
-	}
-
-	public func update(fromPlistRepresentation plist: [ModelPlistKey: Any]) throws {
-		guard self.id == plist.attribute(withKey: .id) else {
-			throw ModelObjectUpdateErrors.idsDontMatch
-		}
-
-		let title: String = try plist.requiredAttribute(withKey: .Folder.title)
-		let dateCreated: Date = try plist.requiredAttribute(withKey: .Folder.dateCreated)
-
-		let contentsIDs: [ModelID] = try plist.requiredAttribute(withKey: .Folder.contents)
-		let contents = contentsIDs.compactMap { self.modelController?.object(with: $0) as? FolderContainable }
-		guard contentsIDs.count == contents.count else {
-			throw ModelObjectUpdateErrors.attributeNotFound(ModelPlistKey.Folder.contents.rawValue)
-		}
-		contents.forEach { $0.containingFolder = self }
-
-		self.title = title
-		self.dateCreated = dateCreated
-		self.contents = contents
-
-		let plistKeys = ModelPlistKey.Folder.all
-		self.otherProperties = plist.filter { (key, _) -> Bool in
-			return plistKeys.contains(key) == false
-		}
-	}
 }
-
-
-extension ModelPlistKey {
-	enum Folder {
-		static let title = ModelPlistKey(rawValue: "title")
-		static let dateCreated = ModelPlistKey(rawValue: "dateCreated")
-		static let contents = ModelPlistKey(rawValue: "contents")
-
-		static var all: [ModelPlistKey] {
-			return [.id, .Folder.title, .Folder.dateCreated, .Folder.contents]
-		}
-	}
-}
-
 
 
 
@@ -883,6 +413,22 @@ public struct PageLink: Equatable, Hashable {
 	}
 }
 
+extension PageLink: PlistConvertable {
+	public func toPlistValue() throws -> PlistValue {
+		return self.url.absoluteString
+	}
+	
+	public static func fromPlistValue(_ plistValue: PlistValue) throws -> PageLink {
+		let url: URL = try .fromPlistValue(plistValue)
+		guard let pageLink = PageLink(url: url) else {
+			throw PlistConvertableError.invalidConversionFromPlistValue
+		}
+		return pageLink
+	}
+	
+
+}
+
 extension NSImage {
 	func pngData() -> Data? {
 		return nil
@@ -890,10 +436,32 @@ extension NSImage {
 }
 
 
-public protocol PageContent {
-	var page: Page? { get set }
-	var initialContentSize: CGSize? { get }
-	var modelFile: ModelFile { get }
+public class PageContent: PlistConvertable {
+	weak var page: Page?
+	var initialContentSize: CGSize? {
+		return nil
+	}
+	var modelFile: ModelFile {
+		return ModelFile(type: "", filename: nil, data: nil, metadata: nil)
+	}
+}
+
+extension PageContent {
+	public func toPlistValue() throws -> PlistValue {
+		return self.modelFile
+	}
+
+	public static func fromPlistValue(_ plistValue: PlistValue) throws -> Self {
+		guard
+			let modelFile = plistValue as? ModelFile,
+			let contentType = PageContentType(rawValue: modelFile.type),
+			let content = try contentType.createContent(modelFile: modelFile) as? Self
+		else {
+			throw PlistConvertableError.invalidConversionFromPlistValue
+		}
+
+		return content
+	}
 }
 
 enum PageContentType: String {
@@ -902,14 +470,6 @@ enum PageContentType: String {
 
 	func createContent(modelFile: ModelFile) throws -> PageContent {
 		throw NSError(domain: "Test", code: -1)
-	}
-}
-
-class TestPageContent: PageContent {
-	var page: Page?
-	var initialContentSize: CGSize?
-	var modelFile: ModelFile {
-		return ModelFile(type: "", filename: nil, data: nil, metadata: nil)
 	}
 }
 

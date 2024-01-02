@@ -25,7 +25,41 @@ extension VariableDeclSyntax {
 	}
 
 	var bindingType: TypeSyntax? {
-		return self.bindings.first?.typeAnnotation?.type
+		guard let binding = self.bindings.first else {
+			return nil
+		}
+
+		if let type = binding.typeAnnotation?.type {
+			return type
+		}
+
+		guard let initializer = binding.initializer?.value else {
+			return nil
+		}
+
+		if let function = initializer.as(FunctionCallExprSyntax.self) {
+			guard let identifier = function.calledExpression.as(DeclReferenceExprSyntax.self)?.baseName else {
+				return nil
+			}
+			return IdentifierTypeSyntax(name: identifier).as(TypeSyntax.self)
+		}
+
+		if initializer.as(IntegerLiteralExprSyntax.self) != nil {
+			let token: TokenSyntax = "Int"
+			return IdentifierTypeSyntax(name: token).as(TypeSyntax.self)
+		}
+
+		if initializer.as(FloatLiteralExprSyntax.self) != nil {
+			let token: TokenSyntax = "Float"
+			return IdentifierTypeSyntax(name: token).as(TypeSyntax.self)
+		}
+
+		if initializer.as(BooleanLiteralExprSyntax.self) != nil {
+			let token: TokenSyntax = "Bool"
+			return IdentifierTypeSyntax(name: token).as(TypeSyntax.self)
+		}
+
+		return nil
 	}
 
 	func withAccess(_ access: String) -> VariableDeclSyntax {

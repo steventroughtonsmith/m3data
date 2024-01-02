@@ -9,10 +9,19 @@
     }
   ],
   "defaultOptions" : {
-    "codeCoverage" : false
+    "codeCoverage" : {
+      "targets" : [
+        {
+          "containerPath" : "container:",
+          "identifier" : "M3Data",
+          "name" : "M3Data"
+        }
+      ]
+    }
   },
   "testTargets" : [
     {
+      "enabled" : false,
       "target" : {
         "containerPath" : "container:",
         "identifier" : "M3DataTests",

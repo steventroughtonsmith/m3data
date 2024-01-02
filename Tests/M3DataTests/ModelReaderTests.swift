@@ -71,15 +71,15 @@ final class ModelReaderTests: XCTestCase {
         let animalsCollection = self.modelController.collection(for: PersistenceTestObjects.Animal.self)
 
         let animal1 = try XCTUnwrap(animalsCollection.objectWithID(ModelID(modelType: PersistenceTestObjects.Animal.modelType, uuidString: "4932FB60-6D49-4E15-AFD0-599D32CC5F94")!))
-        XCTAssertEqual(animal1.plistRepresentation[ModelPlistKey(rawValue: "species")] as? String, "Birb")
-        XCTAssertEqual(animal1.plistRepresentation[ModelPlistKey(rawValue: "lastMeal")] as? String, "Bob")
+		XCTAssertEqual(animal1.plistRepresentation.plist[ModelPlistKey(rawValue: "species")] as? String, "Birb")
+		XCTAssertEqual(animal1.plistRepresentation.plist[ModelPlistKey(rawValue: "lastMeal")] as? String, "Bob")
         let animal2 = try XCTUnwrap(animalsCollection.objectWithID(ModelID(modelType: PersistenceTestObjects.Animal.modelType, uuidString: "5932FB60-6D49-4E15-AFD0-599D32CC5F94")!))
-        XCTAssertEqual(animal2.plistRepresentation[ModelPlistKey(rawValue: "species")] as? String, "Bear")
-        XCTAssertEqual(animal2.plistRepresentation[ModelPlistKey(rawValue: "lastMeal")] as? String, "Alice")
+		XCTAssertEqual(animal2.plistRepresentation.plist[ModelPlistKey(rawValue: "species")] as? String, "Bear")
+		XCTAssertEqual(animal2.plistRepresentation.plist[ModelPlistKey(rawValue: "lastMeal")] as? String, "Alice")
         let animal3 = try XCTUnwrap(animalsCollection.objectWithID(ModelID(modelType: PersistenceTestObjects.Animal.modelType, uuidString: "6932FB60-6D49-4E15-AFD0-599D32CC5F94")!))
-        XCTAssertEqual(animal3.plistRepresentation[ModelPlistKey(rawValue: "species")] as? String, "Possum")
-        XCTAssertEqual(animal3.plistRepresentation[ModelPlistKey(rawValue: "lastMeal")] as? String, "Pilky")
-        let modelFile = try XCTUnwrap(animal3.plistRepresentation[ModelPlistKey(rawValue: "image")] as? ModelFile)
+		XCTAssertEqual(animal3.plistRepresentation.plist[ModelPlistKey(rawValue: "species")] as? String, "Possum")
+		XCTAssertEqual(animal3.plistRepresentation.plist[ModelPlistKey(rawValue: "lastMeal")] as? String, "Pilky")
+		let modelFile = try XCTUnwrap(animal3.plistRepresentation.plist[ModelPlistKey(rawValue: "image")] as? ModelFile)
         XCTAssertEqual(modelFile.type, "png")
         XCTAssertEqual(modelFile.filename, "photo.png")
         XCTAssertEqual(modelFile.metadata?["colour"] as? Bool, true)
@@ -87,10 +87,10 @@ final class ModelReaderTests: XCTestCase {
 
         let robotsCollection = self.modelController.collection(for: PersistenceTestObjects.Robot.self)
         let robot1 = try XCTUnwrap(robotsCollection.objectWithID(ModelID(modelType: PersistenceTestObjects.Robot.modelType, uuidString: "4932FB60-6D49-4E15-AFD0-599D32CC5F94")!))
-        XCTAssertEqual(robot1.plistRepresentation[ModelPlistKey(rawValue: "name")] as? String, "PilkyBot")
+		XCTAssertEqual(robot1.plistRepresentation.plist[ModelPlistKey(rawValue: "name")] as? String, "PilkyBot")
 
         let robot2 = try XCTUnwrap(robotsCollection.objectWithID(ModelID(modelType: PersistenceTestObjects.Robot.modelType, uuidString: "5932FB60-6D49-4E15-AFD0-599D32CC5F94")!))
-        XCTAssertEqual(robot2.plistRepresentation[ModelPlistKey(rawValue: "name")] as? String, "SinisterBot")
+		XCTAssertEqual(robot2.plistRepresentation.plist[ModelPlistKey(rawValue: "name")] as? String, "SinisterBot")
 
         XCTAssertEqual(self.modelController.settings.integer(for: ModelSettings.Setting(rawValue: "zoo-efficiency")), 90)
     }

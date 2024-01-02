@@ -7,12 +7,14 @@
 
 import Foundation
 
-protocol PlistConvertable {
+public protocol PlistConvertable {
 	func toPlistValue() throws -> PlistValue
 
 	static func fromPlistValue(_ plistValue: PlistValue) throws -> Self
 }
 
-enum PlistConvertableError: Error {
+public enum PlistConvertableError: Error {
 	case invalidConversionFromPlistValue
+	case invalidConversionToPlistValue
+	case attemptedToConvertNonHomogeneousCollection
 }

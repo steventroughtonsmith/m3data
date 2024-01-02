@@ -9,28 +9,28 @@ import Foundation
 import M3Data
 
 enum PersistenceTestObjects {
-    final class Person: NSObject, CollectableModelObject {
-        static let modelType = ModelType("Person")!
+	final class Person: NSObject, CollectableModelObject {
+        static let modelType = ModelType("Person")
         var id = ModelID(modelType: Person.modelType)
         var collection: ModelCollection<Person>?
 
-        let otherProperties = [ModelPlistKey: Any]()
-        var plistRepresentation = [ModelPlistKey: Any]()
+        let otherProperties = [ModelPlistKey: PlistValue]()
+		lazy var plistRepresentation = ModelObjectPlistRepresentation(id: id, plist: [:])
 
-        func update(fromPlistRepresentation plist: [ModelPlistKey: Any]) throws {
+        func update(fromPlistRepresentation plist: ModelObjectPlistRepresentation) throws {
             self.plistRepresentation = plist
         }
     }
 
     final class Animal: NSObject, CollectableModelObject {
-        static let modelType = ModelType("Animal")!
+        static let modelType = ModelType("Animal")
         var id = ModelID(modelType: Animal.modelType)
         var collection: ModelCollection<Animal>?
 
-        let otherProperties = [ModelPlistKey: Any]()
-        var plistRepresentation = [ModelPlistKey: Any]()
+        let otherProperties = [ModelPlistKey: PlistValue]()
+		lazy var plistRepresentation = ModelObjectPlistRepresentation(id: id, plist: [:])
 
-        func update(fromPlistRepresentation plist: [ModelPlistKey: Any]) throws {
+        func update(fromPlistRepresentation plist: ModelObjectPlistRepresentation) throws {
             self.plistRepresentation = plist
         }
 
@@ -42,17 +42,26 @@ enum PersistenceTestObjects {
             }
             return [ModelPlistKey(rawValue: "image"): .modelFile]
         }
+
+		static var modelFileProperties: [ModelPlistKey] {
+			if let modelFilePropertiesOverride {
+				return modelFilePropertiesOverride
+			}
+			return [ModelPlistKey(rawValue: "image")]
+		}
+
+		static var modelFilePropertiesOverride: [ModelPlistKey]?
     }
 
     final class Robot: NSObject, CollectableModelObject {
-        static let modelType = ModelType("Robot")!
+        static let modelType = ModelType("Robot")
         var id = ModelID(modelType: Robot.modelType)
         var collection: ModelCollection<Robot>?
 
-        let otherProperties = [ModelPlistKey: Any]()
-        var plistRepresentation = [ModelPlistKey: Any]()
+        let otherProperties = [ModelPlistKey: PlistValue]()
+		lazy var plistRepresentation = ModelObjectPlistRepresentation(id: id, plist: [:])
 
-        func update(fromPlistRepresentation plist: [ModelPlistKey: Any]) throws {
+        func update(fromPlistRepresentation plist: ModelObjectPlistRepresentation) throws {
             self.plistRepresentation = plist
         }
     }
@@ -80,22 +89,22 @@ enum PersistenceTestObjects {
             ]
         }
 
-        override func migrateToNextVersion() throws -> [String: Any] {
+        override func migrateToNextVersion() throws -> [String: PlistValue] {
             var plist = self.plist
             plist["animals"] = [
                 ["id": "Animal_4932FB60-6D49-4E15-AFD0-599D32CC5F94", "species": "Birb"] as [String: Any],
                 ["id": "Animal_5932FB60-6D49-4E15-AFD0-599D32CC5F94", "species": "Bear"],
                 ["id": "Animal_6932FB60-6D49-4E15-AFD0-599D32CC5F94", "species": "Possum", "image": ["type": "png", "filename": "photo.png", "metadata": ["colour": true]] as [String: Any]],
-            ]
+            ] as PlistValue
             plist["settings"] = ["zoo-efficiency": 90]
             plist["version"] = 2
             return plist
         }
 
-        static var samplePlist: [String: Any] {
+        static var samplePlist: [String: PlistValue] {
             return [
                 "version": 1,
-                "settings": [String: Any](),
+                "settings": [String: Any]() as PlistValue,
                 "people": [
                     ["id": "Person_4932FB60-6D49-4E15-AFD0-599D32CC5F94", "name": "Bob"],
                     ["id": "Person_5932FB60-6D49-4E15-AFD0-599D32CC5F94", "name": "Alice"],
@@ -122,22 +131,23 @@ enum PersistenceTestObjects {
             ]
         }
 
-        override func migrateToNextVersion() throws -> [String: Any] {
+        override func migrateToNextVersion() throws -> [String: PlistValue] {
             var plist = self.plist
 
-            var finalAnimals = [[String: Any]]()
-            for animalPlist in self.plistRepresentations(of: Animal.modelType) {
-                var animal = animalPlist
-                if (animal[.id] as? ModelID)?.uuid.uuidString == "4932FB60-6D49-4E15-AFD0-599D32CC5F94" {
-                    animal[ModelPlistKey(rawValue: "lastMeal")] = "Bob"
-                } else if (animal[.id] as? ModelID)?.uuid.uuidString == "5932FB60-6D49-4E15-AFD0-599D32CC5F94" {
-                    animal[ModelPlistKey(rawValue: "lastMeal")] = "Alice"
-                } else if (animal[.id] as? ModelID)?.uuid.uuidString == "6932FB60-6D49-4E15-AFD0-599D32CC5F94" {
-                    animal[ModelPlistKey(rawValue: "lastMeal")] = "Pilky"
+            var finalAnimals = [[String: PlistValue]]()
+            for animal in self.plistRepresentations(of: Animal.modelType) {
+				var animalPlist = animal.plist
+				if animal.id.uuid.uuidString == "4932FB60-6D49-4E15-AFD0-599D32CC5F94" {
+                    animalPlist[ModelPlistKey(rawValue: "lastMeal")] = "Bob"
+				} else if animal.id.uuid.uuidString == "5932FB60-6D49-4E15-AFD0-599D32CC5F94" {
+                    animalPlist[ModelPlistKey(rawValue: "lastMeal")] = "Alice"
+				} else if animal.id.uuid.uuidString == "6932FB60-6D49-4E15-AFD0-599D32CC5F94" {
+                    animalPlist[ModelPlistKey(rawValue: "lastMeal")] = "Pilky"
                 }
-                finalAnimals.append(animal.toPersistanceRepresentation)
+				finalAnimals.append(animalPlist.persistenceRepresentation)
             }
-            plist["animals"] = finalAnimals
+
+            plist["animals"] = finalAnimals as PlistValue
             plist["people"] = nil
             plist["version"] = 3
             return plist
@@ -177,7 +187,7 @@ enum PersistenceTestObjects {
             ]
         }
 
-        static var samplePlist: [String: Any] {
+        static var samplePlist: [String: PlistValue] {
             return [
                 "version": 3,
                 "settings": ["zoo-efficiency": 90],
@@ -185,7 +195,7 @@ enum PersistenceTestObjects {
                     ["id": "Animal_4932FB60-6D49-4E15-AFD0-599D32CC5F94", "species": "Birb", "lastMeal": "Bob"],
                     ["id": "Animal_5932FB60-6D49-4E15-AFD0-599D32CC5F94", "species": "Bear", "lastMeal": "Alice"] as [String: Any],
                     ["id": "Animal_6932FB60-6D49-4E15-AFD0-599D32CC5F94", "species": "Possum", "lastMeal": "Pilky", "image": ["type": "png", "filename": "photo.png", "metadata": ["colour": true]] as [String: Any]],
-                ],
+                ] as PlistValue,
                 "robots": [
                     ["id": "Robot_4932FB60-6D49-4E15-AFD0-599D32CC5F94", "name": "PilkyBot"],
                     ["id": "Robot_5932FB60-6D49-4E15-AFD0-599D32CC5F94", "name": "SinisterBot"],

@@ -14,11 +14,11 @@ public struct ModelType: RawRepresentable, Equatable, Hashable {
 
     public let rawValue: String
 
-    public init?(rawValue: String) {
+    public init(rawValue: String) {
         self.rawValue = rawValue
     }
 
-    public init?(_ rawValue: String) {
+    public init(_ rawValue: String) {
         self.rawValue = rawValue
     }
 }
@@ -44,39 +44,32 @@ public struct ModelID: Equatable, Hashable {
 
 //MARK: - PlistConversion
 extension ModelID: PlistConvertable {
-	func toPlistValue() throws -> PlistValue {
-		"\(self.modelType.rawValue)_\(self.uuid.uuidString)"
+	public func toPlistValue() throws -> PlistValue {
+		return self.stringRepresentation
 	}
-	
-	static func fromPlistValue(_ plistValue: PlistValue) throws -> ModelID {
-		guard let value = plistValue as? String else {
-			throw PlistConvertableError.invalidConversionFromPlistValue
-		}
 
-		let components = value.split(separator: "_")
+	public static func fromPlistValue(_ plistValue: PlistValue) throws -> ModelID {
 		guard
-			components.count == 2,
-			let modelType = ModelType(rawValue: String(components[0])),
-			let modelID = ModelID(modelType: modelType, uuidString: String(components[1]))
+			let value = plistValue as? String,
+			let modelID = ModelID(string: value)
 		else {
 			throw PlistConvertableError.invalidConversionFromPlistValue
 		}
 		return modelID
 	}
-	
-	
+}
 
+//MARK: - String representation
+extension ModelID {
     public var stringRepresentation: String {
         return "\(self.modelType.rawValue)_\(self.uuid.uuidString)"
     }
 
     public init?(string: String) {
         let components = string.split(separator: "_")
-        guard components.count == 2,
-            let modelType = ModelType(rawValue: String(components[0]))
-        else {
+        guard components.count == 2 else {
             return nil
         }
-        self.init(modelType: modelType, uuidString: String(components[1]))
+        self.init(modelType: ModelType(rawValue: String(components[0])), uuidString: String(components[1]))
     }
 }
