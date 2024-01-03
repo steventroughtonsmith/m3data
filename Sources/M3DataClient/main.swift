@@ -145,7 +145,7 @@ final public class Page {
 	}
 
 	// MARK: - Content
-	@Attribute(isModelFile: true) public var content: PageContent {
+	@Attribute(isModelFile: true) public var content: Page.Content {
 		didSet {
 			self.content.page = self
 			NotificationCenter.default.post(name: Page.contentChangedNotification, object: self)
@@ -446,7 +446,7 @@ public class PageContent: PlistConvertable {
 	}
 }
 
-extension PageContent {
+extension Page.Content {
 	public func toPlistValue() throws -> PlistValue {
 		return self.modelFile
 	}
@@ -454,7 +454,7 @@ extension PageContent {
 	public static func fromPlistValue(_ plistValue: PlistValue) throws -> Self {
 		guard
 			let modelFile = plistValue as? ModelFile,
-			let contentType = PageContentType(rawValue: modelFile.type),
+			let contentType = Page.ContentType(rawValue: modelFile.type),
 			let content = try contentType.createContent(modelFile: modelFile) as? Self
 		else {
 			throw PlistConvertableError.invalidConversionFromPlistValue
@@ -464,11 +464,11 @@ extension PageContent {
 	}
 }
 
-enum PageContentType: String {
+enum Page.ContentType: String {
 	case text
 	case image
 
-	func createContent(modelFile: ModelFile) throws -> PageContent {
+	func createContent(modelFile: ModelFile) throws -> Page.Content {
 		throw NSError(domain: "Test", code: -1)
 	}
 }

@@ -65,7 +65,7 @@ public struct ModelMacro: MemberMacro {
 
 		let attributesString = modelFileAttributes.map { $0.plistKey(for: classDecl) }.joined(separator: ", ")
 		return """
-			static var modelFileProperties: [ModelPlistKey] {
+			static public var modelFileProperties: [ModelPlistKey] {
 				return [\(raw: attributesString)]
 			}
 			"""
@@ -119,7 +119,7 @@ guard self.id == plist.id else {
 			for relationship in classDecl.relationships {
 				"self.\(raw: RelationshipMacro.modelIDProperty(forPropertyNamed: relationship.name)) = \(raw: relationship.name)"
 			}
-			CodeBlockItemSyntax("let plistKeys = ModelPlistKey.\(raw: classDecl.name.trimmed).all")
+			CodeBlockItemSyntax("let plistKeys = \(raw: classDecl.name.trimmed).PlistKeys.all")
 			CodeBlockItemSyntax("""
 self.otherProperties = plist.plist.filter { (key, _) -> Bool in
 	return plistKeys.contains(key) == false
@@ -139,7 +139,6 @@ extension ModelMacro: ExtensionMacro {
 
 		let hashable = try ExtensionDeclSyntax("extension \(type): Hashable") {
 			try FunctionDeclSyntax("public func hash(into hasher: inout Hasher)") {
-				CodeBlockItemSyntax("hasher.combine(Self.modelType)")
 				CodeBlockItemSyntax("hasher.combine(self.id)")
 			}
 		}
@@ -153,18 +152,15 @@ extension ModelMacro: ExtensionMacro {
 				)
 			}
 		}
-		return [collectableModelObject, hashable, equatable]
-	}
-}
+		var extensions = [collectableModelObject, hashable, equatable]
 
-extension ModelMacro: PeerMacro {
-	public static func expansion(of node: AttributeSyntax,
-								 providingPeersOf declaration: some DeclSyntaxProtocol,
-								 in context: some MacroExpansionContext) throws -> [DeclSyntax] {
-		guard let classDecl = declaration.as(ClassDeclSyntax.self) else {
-			return []
+		if let classDecl = declaration.as(ClassDeclSyntax.self) {
+			extensions.append(try self.plistKeyExtension(for: classDecl))
 		}
+		return extensions
+	}
 
+	private static func plistKeyExtension(for classDecl: ClassDeclSyntax) throws -> ExtensionDeclSyntax {
 		let attributes = classDecl.attributes
 		let relationships = classDecl.relationships
 
@@ -172,8 +168,8 @@ extension ModelMacro: PeerMacro {
 		allKeysArray.append(contentsOf: attributes.map { $0.plistKey(for: classDecl) })
 		allKeysArray.append(contentsOf: relationships.map { $0.plistKey(for: classDecl) })
 
-		let modelPlistKeyExtension = try ExtensionDeclSyntax("extension ModelPlistKey") {
-			try EnumDeclSyntax("enum \(raw: classDecl.name.trimmed.text)") {
+		let modelPlistKeyExtension = try ExtensionDeclSyntax("extension \(raw: classDecl.name.trimmed)") {
+			try EnumDeclSyntax("enum PlistKeys") {
 				for attribute in attributes {
 					if let persistenceName = attribute.persistenceName {
 						try VariableDeclSyntax("static let \(raw: attribute.name.trimmed) = ModelPlistKey(rawValue: \(raw: persistenceName.trimmed))")
@@ -193,7 +189,7 @@ extension ModelMacro: PeerMacro {
 				}
 			}
 		}
-		return [DeclSyntax(modelPlistKeyExtension)]
+		return modelPlistKeyExtension
 	}
 }
 
@@ -260,7 +256,7 @@ extension ClassDeclSyntax {
 		var isModelFile: Bool = false
 
 		func plistKey(for classDecl: ClassDeclSyntax) -> String {
-			return ".\(classDecl.name.text).\(self.name.text)"
+			return "\(classDecl.name.text).PlistKeys.\(self.name.text)"
 		}
 
 		private var isOptional: Bool {
@@ -283,7 +279,7 @@ extension ClassDeclSyntax {
 		var persistenceName: ExprSyntax? = nil
 
 		func plistKey(for classDecl: ClassDeclSyntax) -> String {
-			return ".\(classDecl.name.text).\(self.name.text)"
+			return "\(classDecl.name.text).PlistKeys.\(self.name.text)"
 		}
 
 		func variableDefinition(with classDecl: ClassDeclSyntax) -> CodeBlockItemSyntax {
