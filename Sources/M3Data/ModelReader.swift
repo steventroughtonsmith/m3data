@@ -87,7 +87,7 @@ public class ModelReader {
             }
 
             for id in itemsToAdd {
-                collection.newObject() { $0.id = id }
+				collection.newObject(modelID: id)
             }
         }
     }

@@ -79,9 +79,9 @@ public class ModelCollection<ModelType: CollectableModelObject> {
     }
 
     public typealias ModelSetupBlock = (ModelType) -> Void
-    @discardableResult public func newObject(setupBlock: ModelSetupBlock? = nil) -> ModelType {
+	@discardableResult public func newObject(modelID: ModelID? = nil, setupBlock: ModelSetupBlock? = nil) -> ModelType {
         self.modelController?.pushChangeGroup()
-        let newObject = ModelType()
+		let newObject = (modelID != nil) ? ModelType(id: modelID!) : ModelType()
         newObject.collection = self
 
         self.insert(newObject, notifyOfChange: false)
@@ -244,9 +244,9 @@ public class AnyModelCollection {
     }
 
     public typealias ModelSetupBlock = (any CollectableModelObject) -> Void
-    fileprivate var newObjectImp: (((ModelSetupBlock)?) -> (any CollectableModelObject))?
-    @discardableResult public func newObject(setupBlock: (ModelSetupBlock)? = nil) -> any CollectableModelObject {
-        return self.newObjectImp!(setupBlock)
+    fileprivate var newObjectImp: ((ModelID?, (ModelSetupBlock)?) -> (any CollectableModelObject))?
+	@discardableResult public func newObject(modelID: ModelID? = nil, setupBlock: (ModelSetupBlock)? = nil) -> any CollectableModelObject {
+        return self.newObjectImp!(modelID, setupBlock)
     }
 
     fileprivate var pushChangeGroupImp: () -> Void = {}
@@ -290,8 +290,8 @@ extension ModelCollection {
             self.delete(typedObject)
         }
 
-        anyCollection.newObjectImp = { setupBlock in
-            return self.newObject(setupBlock: setupBlock)
+        anyCollection.newObjectImp = { modelID, setupBlock in
+			return self.newObject(modelID: modelID, setupBlock: setupBlock)
         }
 
         anyCollection.pushChangeGroupImp = {

@@ -12,6 +12,7 @@ import Foundation
 public enum ModelObjectUpdateErrors: Error, Equatable {
     case idsDontMatch
     case attributeNotFound(String)
+	case invalidAttributeType(String)
     case modelControllerNotSet
 }
 
@@ -36,12 +37,12 @@ public indirect enum ModelPropertyConversion {
 //MARK: -
 /// The protocol root for model objects, used where generics can't be
 public protocol ModelObject: AnyObject {
-    var id: ModelID { get set }
+    var id: ModelID { get }
     static var modelType: ModelType { get }
     var modelController: ModelController? { get }
     var undoManager: UndoManager? { get }
 
-    init()
+	init(id: ModelID)
 
     var otherProperties: [ModelPlistKey: PlistValue] { get }
 
@@ -63,6 +64,10 @@ public protocol ModelObject: AnyObject {
 
 
 extension ModelObject {
+	public init() {
+		self.init(id: ModelID(modelType: Self.modelType))
+	}
+
     public static func modelID(with uuid: UUID) -> ModelID {
         return ModelID(modelType: self.modelType, uuid: uuid)
     }

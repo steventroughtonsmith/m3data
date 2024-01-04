@@ -43,7 +43,11 @@ public struct ModelObjectPlistRepresentation {
 			guard let rawValue = self.plist[key] else {
 				return nil
 			}
-			return try T.fromPlistValue(rawValue)
+			do {
+				return try T.fromPlistValue(rawValue)
+			} catch {
+				throw ModelObjectUpdateErrors.invalidAttributeType(key.rawValue)
+			}
 		}
 	}
 
@@ -52,16 +56,24 @@ public struct ModelObjectPlistRepresentation {
 			guard let rawValue = self.plist[key] else {
 				return `default`
 			}
-			return try T.fromPlistValue(rawValue)
+			do {
+				return try T.fromPlistValue(rawValue)
+			} catch {
+				throw ModelObjectUpdateErrors.invalidAttributeType(key.rawValue)
+			}
 		}
 	}
 
 	public subscript<T: PlistConvertable>(required key: ModelPlistKey) -> T {
 		get throws {
-			guard let value: T = try self[key] else {
+			guard let rawValue = self.plist[key] else {
 				throw ModelObjectUpdateErrors.attributeNotFound(key.rawValue)
 			}
-			return value
+			do {
+				return try T.fromPlistValue(rawValue)
+			} catch {
+				throw ModelObjectUpdateErrors.invalidAttributeType(key.rawValue)
+			}
 		}
 	}
 

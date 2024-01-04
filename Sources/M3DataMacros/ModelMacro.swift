@@ -41,7 +41,7 @@ public struct ModelMacro: MemberMacro {
 	private static func modelObjectDefinitions(forClassName className: TokenSyntax) -> [DeclSyntax] {
 		return [
 			"public static let modelType: ModelType = ModelType(rawValue: \"\(raw: className.text)\")",
-			"public var id = ModelID(modelType: \(raw: className.text).modelType)",
+			"public private(set) var id: ModelID",
 			"public weak var collection: ModelCollection<\(raw: className.text)>?",
 			"public var otherProperties: [ModelPlistKey: PlistValue] = [:]",
 		]
@@ -50,11 +50,11 @@ public struct ModelMacro: MemberMacro {
 	private static func initDefinition(in classDecl: ClassDeclSyntax) -> DeclSyntax? {
 		let initialisers = classDecl.memberBlock.members.compactMap { $0.decl.as(InitializerDeclSyntax.self) }
 		for initialiser in initialisers {
-			if initialiser.signature.parameterClause.parameters.count == 0 {
+			if initialiser.signature.parameterClause.parameters.count == 1 {
 				return nil
 			}
 		}
-		return "public init() {}"
+		return "public init(id: ModelID) { self.id = id }"
 	}
 
 	private static func modelFilePropertiesDefinition(in classDecl: ClassDeclSyntax) -> DeclSyntax? {
