@@ -21,7 +21,9 @@ public struct ModelFile {
 	}
 }
 
-extension ModelFile: PlistValue {
+extension ModelFile: PlistValue {}
+
+extension ModelFile: PlistConvertable {
 	public func toPlistValue() throws -> PlistValue {
 		var plist: [String: Any] = ["type": self.type]
 		if let filename = self.filename {
@@ -42,7 +44,7 @@ extension ModelFile: PlistValue {
 			let modelFileDict = plistValue as? [String: Any],
 			let type = modelFileDict["type"] as? String
 		else {
-			throw PlistConvertableError.invalidConversionFromPlistValue
+			throw PlistConvertableError.invalidConversion(fromPlistValue: plistValue, to: self)
 		}
 
 		return ModelFile(type: type,

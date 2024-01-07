@@ -25,7 +25,7 @@ public class ModelReader {
     public func read(plistWrapper: FileWrapper, contentWrapper: FileWrapper?, shouldMigrate: () -> Bool) throws {
         guard
             let plistData = plistWrapper.regularFileContents,
-			let plistDict = try? PropertyListSerialization.propertyList(from: plistData, format: nil) as? [String: Any],
+			let plistDict = try? PropertyListSerialization.propertyListValue(from: plistData) as? [String: PlistValue],
 			let convertedDict = plistDict as? [String: PlistValue]
         else {
             throw Errors.invalidPlist
@@ -48,11 +48,12 @@ public class ModelReader {
 
         self.modelController.settings.update(withPlist: plist.settings)
 
-        for (modelType, collection) in self.modelController.allCollections {
+		for (modelType, collection) in self.modelController.allCollections.sorted(by: { $0.key.rawValue < $1.key.rawValue }) {
             self.createAndDeleteObjects(in: collection, using: plist.plistRepresentations(of: modelType))
         }
 
-        for (modelType, collection) in self.modelController.allCollections {
+        for (modelType, collection) in self.modelController.allCollections.sorted(by: { $0.key.rawValue < $1.key.rawValue }) {
+			print("Updating \(modelType.rawValue)")
             try self.updateObjects(in: collection, using: plist.plistRepresentations(of: modelType), content: contentWrapper?.fileWrappers)
         }
     }
@@ -101,8 +102,10 @@ public class ModelReader {
 
 				let plist: ModelObjectPlistRepresentation
 				if let content {
+					print("has content")
 					plist = try plistRepresentation.applyingModelFiles(from: content, to: item.modelFileProperties)
 				} else {
+					print("doesn't have content")
 					plist = plistRepresentation
 				}
 

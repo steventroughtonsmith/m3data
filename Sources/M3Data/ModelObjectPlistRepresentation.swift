@@ -46,6 +46,7 @@ public struct ModelObjectPlistRepresentation {
 			do {
 				return try T.fromPlistValue(rawValue)
 			} catch {
+				print("Raw value: \(key.rawValue) = \(rawValue)")
 				throw ModelObjectUpdateErrors.invalidAttributeType(key.rawValue)
 			}
 		}
@@ -59,6 +60,7 @@ public struct ModelObjectPlistRepresentation {
 			do {
 				return try T.fromPlistValue(rawValue)
 			} catch {
+				print("Raw value default: \(key.rawValue) = \(rawValue)")
 				throw ModelObjectUpdateErrors.invalidAttributeType(key.rawValue)
 			}
 		}
@@ -72,6 +74,7 @@ public struct ModelObjectPlistRepresentation {
 			do {
 				return try T.fromPlistValue(rawValue)
 			} catch {
+				print("Raw value required \(error): \(key.rawValue) = \(rawValue) type = \(T.self) rawType = \(type(of: rawValue))")
 				throw ModelObjectUpdateErrors.invalidAttributeType(key.rawValue)
 			}
 		}
@@ -81,7 +84,11 @@ public struct ModelObjectPlistRepresentation {
 		var updatedPlist = self.plist
 
 		for plistKey in keys {
-			guard var rawModelFile = updatedPlist[plistKey] as? [String: PlistValue] else {
+			guard
+				let plistValue: PlistValue = updatedPlist[plistKey],
+				var rawModelFile = plistValue as? [String: Any]
+			else {
+				print("continue model files: \(plistKey) \(updatedPlist[plistKey]) valueType: \(type(of: updatedPlist[plistKey]))")
 				continue
 			}
 			if let filename = rawModelFile["filename"] as? String {

@@ -53,7 +53,7 @@ extension ModelID: PlistConvertable {
 			let value = plistValue as? String,
 			let modelID = ModelID(string: value)
 		else {
-			throw PlistConvertableError.invalidConversionFromPlistValue
+			throw PlistConvertableError.invalidConversion(fromPlistValue: plistValue, to: self)
 		}
 		return modelID
 	}

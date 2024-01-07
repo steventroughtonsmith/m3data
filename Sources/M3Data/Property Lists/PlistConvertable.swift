@@ -14,7 +14,7 @@ public protocol PlistConvertable {
 }
 
 public enum PlistConvertableError: Error {
-	case invalidConversionFromPlistValue
+	case invalidConversion(fromPlistValue: PlistValue, to: Any)
 	case invalidConversionToPlistValue
 	case attemptedToConvertNonHomogeneousCollection
 }

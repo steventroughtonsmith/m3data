@@ -38,11 +38,17 @@ open class ModelPlist {
 
         for persistenceTypes in Self.supportedTypes {
 			guard
-				let modelPlists = plist[persistenceTypes.persistenceName] as? [[String: Any]],
-				let typedModelPlists = modelPlists as? [[String: PlistValue]]
+				let modelPlists = plist[persistenceTypes.persistenceName] as? [[String: Any]]
 			else {
                 throw Errors.missingCollection(persistenceTypes.persistenceName)
             }
+
+			let typedModelPlists = modelPlists.map { $0.mapValues({
+				guard let plistValue = $0 as? PlistValue else {
+					return "" as PlistValue
+				}
+				return plistValue
+			})}
 
             let plistRepresentation = try typedModelPlists.map { try ModelObjectPlistRepresentation(persistenceRepresentation: $0) }
             try self.setPlistRepresentations(plistRepresentation, for: persistenceTypes.modelType)
