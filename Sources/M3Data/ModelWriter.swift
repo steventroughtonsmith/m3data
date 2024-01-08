@@ -27,7 +27,6 @@ public class ModelWriter {
             content.append(contentsOf: modelContents)
         }
 
-		print("plist: \(dataPlist.plist)")
         let plistData = try PropertyListSerialization.data(fromPropertyList: dataPlist.plist, format: .xml, options: 0)
         let dataFileWrapper = FileWrapper(regularFileWithContents: plistData)
         let contentFileWrapper = self.fileWrapper(forContent: content)

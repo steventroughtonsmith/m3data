@@ -25,14 +25,13 @@ public class ModelReader {
     public func read(plistWrapper: FileWrapper, contentWrapper: FileWrapper?, shouldMigrate: () -> Bool) throws {
         guard
             let plistData = plistWrapper.regularFileContents,
-			let plistDict = try? PropertyListSerialization.propertyListValue(from: plistData) as? [String: PlistValue],
-			let convertedDict = plistDict as? [String: PlistValue]
+			let plistDict = try? PropertyListSerialization.propertyListValue(from: plistData) as? [String: PlistValue]
         else {
             throw Errors.invalidPlist
         }
 
         //We default to 1 here as the only thing that should not have a version property is a v1 Coppice document
-		let version: Int = try .fromPlistValue(convertedDict["version", default: 1])
+		let version: Int = try .fromPlistValue(plistDict["version", default: 1])
         let plistTypes = self.plistTypes(fromVersion: version)
         guard plistTypes.count > 0 else {
             throw Errors.versionNotSupported
@@ -44,7 +43,7 @@ public class ModelReader {
             }
         }
 
-        let plist = try self.loadPlist(fromDictionary: convertedDict, usingTypes: plistTypes)
+        let plist = try self.loadPlist(fromDictionary: plistDict, usingTypes: plistTypes)
 
         self.modelController.settings.update(withPlist: plist.settings)
 
@@ -53,7 +52,6 @@ public class ModelReader {
         }
 
         for (modelType, collection) in self.modelController.allCollections.sorted(by: { $0.key.rawValue < $1.key.rawValue }) {
-			print("Updating \(modelType.rawValue)")
             try self.updateObjects(in: collection, using: plist.plistRepresentations(of: modelType), content: contentWrapper?.fileWrappers)
         }
     }
@@ -102,10 +100,8 @@ public class ModelReader {
 
 				let plist: ModelObjectPlistRepresentation
 				if let content {
-					print("has content")
 					plist = try plistRepresentation.applyingModelFiles(from: content, to: item.modelFileProperties)
 				} else {
-					print("doesn't have content")
 					plist = plistRepresentation
 				}
 
