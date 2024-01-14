@@ -86,4 +86,26 @@ extension VariableDeclSyntax {
 		variable.bindings = PatternBindingListSyntax([privateBinding])
 		return variable
 	}
+
+	var didSetBody: CodeBlockSyntax? {
+		guard 
+			let binding = self.bindings.first,
+			let accessors = binding.accessorBlock?.accessors.as(AccessorDeclListSyntax.self),
+			let didSet = accessors.first(where: { $0.accessorSpecifier.tokenKind == .keyword(.didSet) })
+		else {
+			return nil
+		}
+		return didSet.body
+	}
+
+	var willSetBody: CodeBlockSyntax? {
+		guard
+			let binding = self.bindings.first,
+			let accessors = binding.accessorBlock?.accessors.as(AccessorDeclListSyntax.self),
+			let willSet = accessors.first(where: { $0.accessorSpecifier.tokenKind == .keyword(.willSet) })
+		else {
+			return nil
+		}
+		return willSet.body
+	}
 }

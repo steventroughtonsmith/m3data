@@ -10,6 +10,10 @@ import M3Data
 
 enum PersistenceTestObjects {
 	final class Person: NSObject, CollectableModelObject {
+		init(id: ModelID) {
+			self.id = id
+		}
+		
         static let modelType = ModelType("Person")
         var id = ModelID(modelType: Person.modelType)
         var collection: ModelCollection<Person>?
@@ -23,6 +27,10 @@ enum PersistenceTestObjects {
     }
 
     final class Animal: NSObject, CollectableModelObject {
+		init(id: ModelID) {
+			self.id = id
+		}
+
         static let modelType = ModelType("Animal")
         var id = ModelID(modelType: Animal.modelType)
         var collection: ModelCollection<Animal>?
@@ -54,6 +62,10 @@ enum PersistenceTestObjects {
     }
 
     final class Robot: NSObject, CollectableModelObject {
+		init(id: ModelID) {
+			self.id = id
+		}
+		
         static let modelType = ModelType("Robot")
         var id = ModelID(modelType: Robot.modelType)
         var collection: ModelCollection<Robot>?

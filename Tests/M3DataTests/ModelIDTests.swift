@@ -94,41 +94,37 @@ class ModelIDTests: XCTestCase {
 
 
 	//MARK: - fromPlistValue(_:)
+	private func invalidConversionTest<Value>(value: Value) throws where Value: PlistValue, Value: Equatable {
+		XCTAssertThrowsError(try ModelID.fromPlistValue(value)) { error in
+			guard
+				let plistError = error as? PlistConvertableError,
+				case .invalidConversion(let fromPlistValue, _) = plistError,
+				let typedPlistValue = fromPlistValue as? Value
+			else {
+				XCTFail()
+				return
+			}
+			XCTAssertEqual(typedPlistValue, value)
+		}
+	}
+
 	func test_fromPlistValue_throwsIfValueNotString() throws {
-		XCTAssertThrowsError(try ModelID.fromPlistValue(["Hello": "World"])) { error in
-			XCTAssertEqual(error as? PlistConvertableError, .invalidConversionFromPlistValue)
-		}
-		XCTAssertThrowsError(try ModelID.fromPlistValue(5)) { error in
-			XCTAssertEqual(error as? PlistConvertableError, .invalidConversionFromPlistValue)
-		}
-		XCTAssertThrowsError(try ModelID.fromPlistValue(5.1)) { error in
-			XCTAssertEqual(error as? PlistConvertableError, .invalidConversionFromPlistValue)
-		}
-		XCTAssertThrowsError(try ModelID.fromPlistValue(42.0 as Float)) { error in
-			XCTAssertEqual(error as? PlistConvertableError, .invalidConversionFromPlistValue)
-		}
-		XCTAssertThrowsError(try ModelID.fromPlistValue(["Hello"])) { error in
-			XCTAssertEqual(error as? PlistConvertableError, .invalidConversionFromPlistValue)
-		}
-		XCTAssertThrowsError(try ModelID.fromPlistValue(Date())) { error in
-			XCTAssertEqual(error as? PlistConvertableError, .invalidConversionFromPlistValue)
-		}
-		XCTAssertThrowsError(try ModelID.fromPlistValue(Data())) { error in
-			XCTAssertEqual(error as? PlistConvertableError, .invalidConversionFromPlistValue)
-		}
+		try self.invalidConversionTest(value: ["Hello": "World"])
+		try self.invalidConversionTest(value: 5)
+		try self.invalidConversionTest(value: 5.1)
+		try self.invalidConversionTest(value: 42.0 as Float)
+		try self.invalidConversionTest(value: ["Hello"])
+		try self.invalidConversionTest(value: Date())
+		try self.invalidConversionTest(value: Data())
 	}
 
 	func test_fromPlistValue_throwsIfMissingComponent() throws {
 		let uuid = UUID()
-		XCTAssertThrowsError(try ModelID.fromPlistValue(uuid.uuidString)) { error in
-			XCTAssertEqual(error as? PlistConvertableError, .invalidConversionFromPlistValue)
-		}
+		try self.invalidConversionTest(value: uuid.uuidString)
 	}
 
 	func test_fromPlistValue_throwsIfUUIDInvalid() throws {
-		XCTAssertThrowsError(try ModelID.fromPlistValue("MyModel_12345")) { error in
-			XCTAssertEqual(error as? PlistConvertableError, .invalidConversionFromPlistValue)
-		}
+		try self.invalidConversionTest(value: "MyModel_12345")
 	}
 
 	func test_fromPlistValue_returnsModelID() throws {

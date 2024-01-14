@@ -34,21 +34,40 @@ extension RelationshipMacro: AccessorMacro {
 		let get: AccessorDeclSyntax =
   """
 get {
- guard let objectID = self.\(raw: self.modelIDProperty(forPropertyNamed: identifier)) else {
+	guard let objectID = self.\(raw: self.modelIDProperty(forPropertyNamed: identifier)) else {
 		return nil
 	}
 	return self.modelController?.collection(for: \(raw: typeName.trimmed).self).objectWithID(objectID)
 }
 """
-		let set: AccessorDeclSyntax =
-  """
+		let set = Self.generateSetter(for: identifier, inverseKeyPath: inverseKeyPath, property: property)
+		return [get, set]
+	}
+
+	private static func generateSetter(for identifier: TokenSyntax, inverseKeyPath: KeyPathExprSyntax, property: VariableDeclSyntax) -> AccessorDeclSyntax {
+		var baseCode: CodeBlockItemListSyntax = """
+let oldValue = self.\(raw: identifier.trimmed)
+self.\(raw: self.modelIDProperty(forPropertyNamed: identifier)) = newValue?.id
+self.didChangeRelationship(\\.\(raw: identifier.trimmed), inverseKeyPath: \(raw: inverseKeyPath.trimmed), oldValue: oldValue)
+"""
+		if let willSet = property.willSetBody?.statements {
+			baseCode.insert("""
+\(raw: willSet)
+
+""", at: baseCode.startIndex)
+		}
+		if let didSet = property.didSetBody?.statements {
+			baseCode.append("""
+
+\(raw: didSet)
+""")
+		}
+
+		return """
 set {
-	let oldValue = self.\(raw: identifier.trimmed)
-	self.\(raw: self.modelIDProperty(forPropertyNamed: identifier)) = newValue?.id
-	self.didChangeRelationship(\\.\(raw: identifier.trimmed), inverseKeyPath: \(raw: inverseKeyPath.trimmed), oldValue: oldValue)
+	\(raw: baseCode)
 }
 """
-		return [get, set]
 	}
 }
 

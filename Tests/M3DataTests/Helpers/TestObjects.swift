@@ -22,7 +22,9 @@ class TestModelObject: ModelObject {
 
     var modelController: ModelController?
 
-    required init() {}
+	required init(id: ModelID) {
+		self.id = id
+	}
 }
 
 final class TestCollectableModelObject: NSObject, CollectableModelObject {
@@ -38,9 +40,9 @@ final class TestCollectableModelObject: NSObject, CollectableModelObject {
 
     static var modelType: ModelType = ModelType("CollectableTest")
 
-    required override init() {
-        super.init()
-    }
+	init(id: ModelID) {
+		self.id = id
+	}
 
     var objectWasInsertedCalled = false
     func objectWasInserted() {
@@ -85,6 +87,10 @@ final class RelationshipModelObject: NSObject, CollectableModelObject {
     var relationship: Set<TestCollectableModelObject> {
         self.relationship(for: \.inverseRelationship)
     }
+
+	init(id: ModelID) {
+		self.id = id
+	}
 }
 
 class TestModelController: NSObject, ModelController {

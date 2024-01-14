@@ -26,7 +26,7 @@ final class PlistConvertableTests: XCTestCase {
 
 	func test_array_fromPlistValue_throwsErrorIfValueNotArray() throws {
 		XCTAssertThrowsError(try [String].fromPlistValue("test")) { error in
-			XCTAssertEqual(error as? PlistConvertableError, .invalidConversionFromPlistValue)
+			XCTAssertEqual(error as? PlistConvertableError, .invalidConversion(fromPlistValue: "test", to: ""))
 		}
 	}
 
@@ -65,7 +65,7 @@ final class PlistConvertableTests: XCTestCase {
 
 	func test_dictionary_fromPlistValue_throwsErrorIfValueNotDictionary() throws {
 		XCTAssertThrowsError(try [String: URL].fromPlistValue("test")) { error in
-			XCTAssertEqual(error as? PlistConvertableError, .invalidConversionFromPlistValue)
+			XCTAssertEqual(error as? PlistConvertableError, .invalidConversion(fromPlistValue: "test", to: ""))
 		}
 	}
 
@@ -91,13 +91,13 @@ final class PlistConvertableTests: XCTestCase {
 
 	func test_url_fromPlistValue_throwsIfValueNotString() throws {
 		XCTAssertThrowsError(try URL.fromPlistValue(42)) { error in
-			XCTAssertEqual(error as? PlistConvertableError, .invalidConversionFromPlistValue)
+			XCTAssertEqual(error as? PlistConvertableError, .invalidConversion(fromPlistValue: "test", to: ""))
 		}
 	}
 
 	func test_url_fromPlistValue_throwsIfStringNotValidURL() throws {
 		XCTAssertThrowsError(try URL.fromPlistValue("")) { error in
-			XCTAssertEqual(error as? PlistConvertableError, .invalidConversionFromPlistValue)
+			XCTAssertEqual(error as? PlistConvertableError, .invalidConversion(fromPlistValue: "test", to: ""))
 		}
 	}
 

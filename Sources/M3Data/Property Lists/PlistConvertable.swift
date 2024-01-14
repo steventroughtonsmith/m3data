@@ -18,3 +18,18 @@ public enum PlistConvertableError: Error {
 	case invalidConversionToPlistValue
 	case attemptedToConvertNonHomogeneousCollection
 }
+
+extension PlistConvertableError: Equatable {
+	public static func == (lhs: PlistConvertableError, rhs: PlistConvertableError) -> Bool {
+		switch (lhs, rhs) {
+		case (.attemptedToConvertNonHomogeneousCollection, .attemptedToConvertNonHomogeneousCollection):
+			return true
+		case (.invalidConversionToPlistValue, .invalidConversionToPlistValue):
+			return true
+		case (.invalidConversion, .invalidConversion):
+			return true
+		default:
+			return false
+		}
+	}
+}

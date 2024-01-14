@@ -130,7 +130,16 @@ final class M3DataMacroTests: XCTestCase {
   @Relationship(inverse: \\MyModel.foobar) var myModels: Set<MyModel>
  }
  @Model class MyModel {
-  @Relationship(inverse: \\MyModel.myModels) var foobar: Foobar?
+  @Relationship(inverse: \\MyModel.myModels) var foobar: Foobar? {
+    willSet {
+      print("Hello World")
+    }
+    didSet {
+      print("new: \\(self.foobar) oldValue: \\(oldValue)")
+      guard oldValue != nil else {
+        return
+      }
+    }
  }
  """,
  expandedSource: """

@@ -25,28 +25,28 @@ final class PlistValueTests: XCTestCase {
 
 	func test_fromPlistValue_throwsIfValueNotOwnType() throws {
 		XCTAssertThrowsError(try String.fromPlistValue(42)) { error in
-			XCTAssertEqual(error as? PlistConvertableError, .invalidConversionFromPlistValue)
+			XCTAssertEqual(error as? PlistConvertableError, .invalidConversion(fromPlistValue: 42, to: ""))
 		}
 		XCTAssertThrowsError(try Int.fromPlistValue(4.2)) { error in
-			XCTAssertEqual(error as? PlistConvertableError, .invalidConversionFromPlistValue)
+			XCTAssertEqual(error as? PlistConvertableError, .invalidConversion(fromPlistValue: 4.2, to: ""))
 		}
 		XCTAssertThrowsError(try Float.fromPlistValue("Test")) { error in
-			XCTAssertEqual(error as? PlistConvertableError, .invalidConversionFromPlistValue)
+			XCTAssertEqual(error as? PlistConvertableError, .invalidConversion(fromPlistValue: "Test", to: ""))
 		}
 		XCTAssertThrowsError(try Double.fromPlistValue("Test")) { error in
-			XCTAssertEqual(error as? PlistConvertableError, .invalidConversionFromPlistValue)
+			XCTAssertEqual(error as? PlistConvertableError, .invalidConversion(fromPlistValue: "Test", to: ""))
 		}
 		XCTAssertThrowsError(try Bool.fromPlistValue(10)) { error in
-			XCTAssertEqual(error as? PlistConvertableError, .invalidConversionFromPlistValue)
+			XCTAssertEqual(error as? PlistConvertableError, .invalidConversion(fromPlistValue: 10, to: ""))
 		}
 		XCTAssertThrowsError(try Date.fromPlistValue(42)) { error in
-			XCTAssertEqual(error as? PlistConvertableError, .invalidConversionFromPlistValue)
+			XCTAssertEqual(error as? PlistConvertableError, .invalidConversion(fromPlistValue: 42, to: ""))
 		}
 		XCTAssertThrowsError(try Data.fromPlistValue(42)) { error in
-			XCTAssertEqual(error as? PlistConvertableError, .invalidConversionFromPlistValue)
+			XCTAssertEqual(error as? PlistConvertableError, .invalidConversion(fromPlistValue: 42, to: ""))
 		}
 		XCTAssertThrowsError(try [String].fromPlistValue(42)) { error in
-			XCTAssertEqual(error as? PlistConvertableError, .invalidConversionFromPlistValue)
+			XCTAssertEqual(error as? PlistConvertableError, .invalidConversion(fromPlistValue: 42, to: ""))
 		}
 //		XCTAssertThrowsError(try [String: PlistValue].fromPlistValue(42)) { error in
 //			XCTAssertEqual(error as? PlistConvertableError, .invalidConversionFromPlistValue)
