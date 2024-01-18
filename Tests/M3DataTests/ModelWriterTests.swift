@@ -5,7 +5,7 @@
 //  Created by Martin Pilkington on 25/07/2022.
 //
 
-@testable import M3Data
+import M3Data
 import XCTest
 
 final class ModelWriterTests: XCTestCase {

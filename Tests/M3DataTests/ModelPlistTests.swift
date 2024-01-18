@@ -7,7 +7,7 @@
 
 import XCTest
 
-@testable import M3Data
+import M3Data
 
 extension ModelPlistKey {
 	static let title = ModelPlistKey(rawValue: "title")

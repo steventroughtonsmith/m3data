@@ -44,7 +44,7 @@ open class ModelPlist {
             }
 
 			let typedModelPlists = modelPlists.map { $0.mapValues({
-				guard let plistValue = $0 as? PlistValue else {
+				guard let plistValue = PlistValueFrom($0) else {
 					return "" as PlistValue
 				}
 				return plistValue
@@ -86,7 +86,7 @@ open class ModelPlist {
         return self.plistRepresentations[modelType] ?? []
     }
 
-    func setPlistRepresentations(_ representations: [ModelObjectPlistRepresentation], for modelType: ModelType) throws {
+    public func setPlistRepresentations(_ representations: [ModelObjectPlistRepresentation], for modelType: ModelType) throws {
         guard Self.supportedTypes.contains(where: { $0.modelType == modelType }) else {
             throw Errors.invalidCollection(modelType.rawValue)
         }
